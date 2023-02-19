@@ -1,4 +1,3 @@
-from pydantic import constr
 from enum import Enum
 from .common_schemas import ActionTimeBase, TimeBase
 from pydantic import Field
@@ -28,11 +27,11 @@ class RequestResponseBase(TimeBase):
 
 
 class MessageAlert(RequestResponseBase):
-    alert: constr(min_length=0, max_length=500)
+    alert: str = Field(min_length=0, max_length=500)
 
 
 class MessageError(RequestResponseBase):
-    error: constr(min_length=0, max_length=500)
+    error: str = Field(min_length=0, max_length=500)
 
 
 class MessageProbe(ActionTimeBase):

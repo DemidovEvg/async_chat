@@ -3,21 +3,18 @@ import socket
 import re
 import ipaddress
 from .. import jim
-
-# Аноним сможет писать только в общую группу '#Флуд'
-# Так же будет приватная группа '#Секреты'
-# Юзеры Иванов, Петров, Сидоров
-
-
-class WrongCommand(Exception):
-    pass
+from ..utils import (
+    WrongCommand,
+    IncommingMessage,
+    OutgoingMessage,
+)
 
 
 class ClientChat:
     def __init__(
             self,
-            account_name: str,
-            password: str,
+            account_name: str | None,
+            password: str | None,
             ip_address: str,
             port: int,
             max_data_size: int = 1024
@@ -27,46 +24,50 @@ class ClientChat:
         self.port = port
         self.ip_address = ipaddress.ip_address(ip_address)
         self.max_data_size = max_data_size
-        self.__chat_socket = None
+        socket.setdefaulttimeout(5)
 
     def connect_to_server(self) -> None:
-        self.__chat_socket = socket.socket(
+        self._chat_socket = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM
         )
-        self.__chat_socket.connect((str(self.ip_address), self.port))
+        self._chat_socket = socket.create_connection(
+            (str(self.ip_address), self.port))
 
     @property
     def chat_socket(self) -> socket.socket:
-        if not self.__chat_socket:
+        if not hasattr(self, '_chat_socket') or not self._chat_socket:
             self.connect_to_server()
-        return self.__chat_socket
+        return self._chat_socket
 
-    def get_response(self) -> str:
-        incomming_message = self.chat_socket.recv(self.max_data_size).decode()
-        print(f'incomming_message={incomming_message}')
+    def get_incomming_message(self) -> IncommingMessage:
+        incomming_message = IncommingMessage(
+            self.chat_socket.recv(self.max_data_size).decode()
+        )
+        print(f'get_incomming_message: {incomming_message=}')
         return incomming_message
 
-    def send_message(self, send_data: str) -> None:
-        print(f'outcomming message={send_data}')
+    def send_outgoing_message(self, outgoing_message: OutgoingMessage) -> None:
+        print(f'send_outgoing_message: {outgoing_message=}')
         try:
-            self.chat_socket.send(send_data.encode())
-        except OSError:
+            self.chat_socket.send(outgoing_message.encode())
+        except OSError as exc:
+            print(f'OSError={str(exc)}')
             self.close_socket()
             self.connect_to_server()
-            self.chat_socket.send(send_data.encode())
+            self.chat_socket.send(outgoing_message.encode())
 
-    def close_socket(self):
+    def close_socket(self) -> None:
         if self.chat_socket:
             self.chat_socket.close()
 
-    def get_message(self) -> str:
+    def get_message(self) -> IncommingMessage:
         try:
-            incomming_message = self.get_response()
+            incomming_message = self.get_incomming_message()
         except OSError as exc:
             print(f'Пробуем переподключиться так как exc={str(exc)}')
             self.connect_to_server()
-            incomming_message = self.get_response()
+            incomming_message = self.get_incomming_message()
         self.close_socket()
         return incomming_message
 
@@ -80,30 +81,35 @@ class ClientChat:
         RE_LOGIN_PARSER = re.compile(
             r'login --account_name=(?P<account_name>\w+) --password=(?P<password>\w+)'
         )
-        result = RE_LOGIN_PARSER.match(command).groupdict()
+        re_match = RE_LOGIN_PARSER.match(command)
+        if not re_match:
+            raise WrongCommand('command not valid')
+
+        result = re_match.groupdict()
         if not result:
             raise WrongCommand('command not valid')
 
-        new_account_name = result.get('account_name')
+        new_account_name = str(result.get('account_name'))
+        new_password = str(result.get('password', self.password))
         if self.account_name and self.account_name != new_account_name:
             print(
-                f'self.account_name={self.account_name} new_account_name={new_account_name}'
+                f'account_name={self.account_name} new_account_name={new_account_name}'
             )
-            self.logout()
+            self.logout(account_name=self.account_name)
 
         self.account_name = new_account_name
-        self.password = result.get('password', self.password)
+        self.password = new_password
 
     def print_help(self) -> None:
         print('Допустимые команды:')
         print('- help')
         print('- login --account_name=account_name --password=password')
         print('- logout')
+        print('- exit')
         print('- presence')
         print('- message Petrov "Привет Петруха"')
-        print('- connect')
 
-    def command_line_loop(self):
+    def command_line_loop(self) -> None:
         self.print_help()
         while True:
             password_mask = self.password and "*" * len(self.password)
@@ -117,13 +123,24 @@ class ClientChat:
                     self.sync_account_name_and_password_from_command(
                         command
                     )
-                    self.login()
+                    self.login(
+                        account_name=str(self.account_name),
+                        password=str(self.password)
+                    )
                 elif 'logout' in command:
-                    self.logout()
+                    self.logout(
+                        account_name=str(self.account_name)
+                    )
                 elif 'presence' in command:
                     self.send_presence()
                 elif 'exit' in command:
-                    self.logout()
+                    try:
+                        self.logout(
+                            account_name=str(self.account_name)
+                        )
+                    except OSError as exc:
+                        print('ERROR: ' + str(exc))
+                        print('Выходим все равно')
                     sys.exit(0)
                 else:
                     print('Не валидная команда, попробуйте еще раз!')
@@ -133,35 +150,35 @@ class ClientChat:
                 print('======================')
                 self.print_help()
 
-    def login(self):
-        if not self.account_name or not self.password:
+    def login(self, account_name: str, password: str) -> IncommingMessage:
+        if not account_name or not password:
             raise Exception('Empty account_name or password')
         message_model = jim.MessageUserAuth(
             user=dict(
-                account_name=self.account_name,
-                password=self.password
+                account_name=account_name,
+                password=password
             )
         )
-        send_data = message_model.json()
-        self.send_message(send_data=send_data)
+        outgoing_message = OutgoingMessage(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
         return self.get_message()
 
-    def logout(self):
+    def logout(self, account_name: str) -> IncommingMessage:
         message_model = jim.MessageUserQuit(
             user=dict(
-                account_name=self.account_name,
+                account_name=account_name,
             )
         )
-        send_data = message_model.json()
-        self.send_message(send_data=send_data)
+        outgoing_message = OutgoingMessage(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
         return self.get_message()
 
-    def send_presence(self):
+    def send_presence(self) -> IncommingMessage:
         if not self.account_name:
             raise Exception('Empty account_name')
         message_model = jim.MessageUserPresence(
             user=dict(account_name=self.account_name)
         )
-        send_data = message_model.json()
-        self.send_message(send_data=send_data)
+        outgoing_message = OutgoingMessage(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
         return self.get_message()

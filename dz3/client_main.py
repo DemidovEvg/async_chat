@@ -7,7 +7,12 @@ from async_chat.client import ClientChat
 @click.option('--password', type=str)
 @click.option('--ip_address', default='127.0.0.1', type=str)
 @click.option('--port', default=3000, type=int)
-def main(account_name: str, password, ip_address: str, port: int):
+def main(
+    account_name: str | None,
+    password: str | None,
+    ip_address: str,
+    port: int
+):
     print(
         f'Инициализируем клента {account_name=}, используя {ip_address=} {port=}'
     )

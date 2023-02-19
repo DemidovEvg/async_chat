@@ -1,4 +1,4 @@
-from pydantic import BaseModel, constr, Field
+from pydantic import BaseModel, Field
 import datetime as dt
 
 
@@ -14,4 +14,4 @@ class TimeBase(BaseModel):
 
 
 class ActionTimeBase(TimeBase):
-    action: constr(min_length=0, max_length=15)
+    action: str = Field(min_length=0, max_length=15)
