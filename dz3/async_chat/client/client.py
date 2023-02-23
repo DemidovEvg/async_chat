@@ -2,8 +2,8 @@ import sys
 import socket
 import re
 import ipaddress
-from .. import jim
-from ..utils import (
+from async_chat import jim
+from async_chat.utils import (
     WrongCommand,
     IncommingMessage,
     OutgoingMessage,
@@ -145,7 +145,7 @@ class ClientChat:
                 else:
                     print('Не валидная команда, попробуйте еще раз!')
                     print('======================')
-            except Exception as exc:
+            except OSError as exc:
                 print('ERROR: ' + str(exc))
                 print('======================')
                 self.print_help()

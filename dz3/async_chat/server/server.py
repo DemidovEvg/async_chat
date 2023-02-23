@@ -3,10 +3,10 @@ import sys
 from typing import Any, TypeVar
 from pydantic import BaseModel
 
-from .. import jim
-from .db import UserService, SessionLocal
-from ..utils import Request, Response
-from .base_server import BaseServerChat
+from async_chat import jim
+from async_chat.server.db import UserService, SessionLocal
+from async_chat.utils import Request, Response
+from async_chat.server.base_server import BaseServerChat
 
 T = TypeVar('T', bound=BaseModel)
 
