@@ -4,7 +4,9 @@ from .client_schemas import (
     MessageUserAuth,
     MessageBaseActionSend,
     MessageSendMessage,
-    MessageUserJoinRoom
+    MessageUserJoinRoom,
+    ClientActions,
+    Statuses
 )
 from .server_schemas import (
     MessageAlert,
@@ -21,6 +23,8 @@ __all__ = [
     'MessageBaseActionSend',
     'MessageSendMessage',
     'MessageUserJoinRoom',
+    'ClientActions',
+    'Statuses',
     'MessageAlert',
     'MessageError',
     'MessageProbe',

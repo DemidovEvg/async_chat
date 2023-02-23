@@ -5,10 +5,10 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Any, Type
 
-from .. import jim
-from .db import UserService, SessionLocal
-from .users_sockets import UsersSockets
-from ..utils import Request, Response, MessageDto, get_message_dto_, T
+from async_chat import jim
+from async_chat.server.db import UserService, SessionLocal
+from async_chat.server.users_sockets import UsersSockets
+from async_chat.utils import Request, Response, MessageDto, get_message_dto_, T
 
 
 def handler(signum, frame):

@@ -12,5 +12,6 @@ class UsersSockets:
         return self.users_sockets.get(user_id)
 
     def drop_client(self, user_id: int) -> bool:
-        del self.users_sockets[user_id]
+        if user_id in self.users_sockets:
+            del self.users_sockets[user_id]
         return True
