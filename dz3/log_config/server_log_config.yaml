@@ -1,0 +1,28 @@
+version: 1
+formatters:
+  simple:
+    format: '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
+  server-format: 
+    format: 'address=%(address)s - %(levelname)s - %(asctime)s - %(name)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+  server-file:
+    class: log_config.server_rotating_file_handler.ServerRotatingFileHandler
+    level: DEBUG
+    formatter: server-format
+    filename: ./log/server_log.log
+    backupCount: 3
+    maxBytes: 1000
+    encoding: utf-8
+loggers:
+  server-logger:
+    level: DEBUG
+    handlers: [console, server-file]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]

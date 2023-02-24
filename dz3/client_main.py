@@ -1,5 +1,6 @@
 import click
 from async_chat.client import ClientChat
+import log_config.client_log_config  # noqa
 
 
 @click.command()

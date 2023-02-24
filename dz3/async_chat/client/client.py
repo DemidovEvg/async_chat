@@ -2,12 +2,16 @@ import sys
 import socket
 import re
 import ipaddress
+import logging
 from async_chat import jim
 from async_chat.utils import (
     WrongCommand,
     IncommingMessage,
     OutgoingMessage,
 )
+from async_chat.utils import get_message_dto_
+
+logger = logging.getLogger('client-logger')
 
 
 class ClientChat:
@@ -44,15 +48,15 @@ class ClientChat:
         incomming_message = IncommingMessage(
             self.chat_socket.recv(self.max_data_size).decode()
         )
-        print(f'get_incomming_message: {incomming_message=}')
+        logger.debug('get_incomming_message: %s', incomming_message)
         return incomming_message
 
     def send_outgoing_message(self, outgoing_message: OutgoingMessage) -> None:
-        print(f'send_outgoing_message: {outgoing_message=}')
+        logger.debug('send_outgoing_message: %s', outgoing_message)
         try:
             self.chat_socket.send(outgoing_message.encode())
         except OSError as exc:
-            print(f'OSError={str(exc)}')
+            logger.error('OSError= %s', str(exc))
             self.close_socket()
             self.connect_to_server()
             self.chat_socket.send(outgoing_message.encode())
@@ -65,7 +69,7 @@ class ClientChat:
         try:
             incomming_message = self.get_incomming_message()
         except OSError as exc:
-            print(f'Пробуем переподключиться так как exc={str(exc)}')
+            logger.error(f'Пробуем переподключиться так как exc={str(exc)}')
             self.connect_to_server()
             incomming_message = self.get_incomming_message()
         self.close_socket()
@@ -116,6 +120,7 @@ class ClientChat:
             command = input(
                 f'Команда(account_name={self.account_name}) self.password={password_mask}: '
             )
+            logger.debug('Input command=%s for=%s', command, self.account_name)
             try:
                 if command == 'help':
                     self.print_help()
@@ -145,20 +150,31 @@ class ClientChat:
                 else:
                     print('Не валидная команда, попробуйте еще раз!')
                     print('======================')
-            except OSError as exc:
+            except (OSError, WrongCommand) as exc:
                 print('ERROR: ' + str(exc))
                 print('======================')
+                logger.error('ERROR: %s', str(exc))
                 self.print_help()
 
     def login(self, account_name: str, password: str) -> IncommingMessage:
         if not account_name or not password:
             raise Exception('Empty account_name or password')
-        message_model = jim.MessageUserAuth(
-            user=dict(
-                account_name=account_name,
-                password=password
-            )
+
+        message_dto = get_message_dto_(
+            schema=jim.MessageUserAuth,
+            data=dict(
+                user=dict(
+                    account_name=account_name,
+                    password=password
+                ))
         )
+        if message_dto.error_message:
+            raise WrongCommand(message_dto.error_message)
+
+        if not message_dto.message_model:
+            raise WrongCommand('Could not get message_model for message')
+
+        message_model: jim.MessageUserAuth = message_dto.message_model
         outgoing_message = OutgoingMessage(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
         return self.get_message()
@@ -169,13 +185,26 @@ class ClientChat:
                 account_name=account_name,
             )
         )
+
+        message_dto = get_message_dto_(
+            schema=jim.MessageUserQuit,
+            data=dict(
+                user=dict(
+                    account_name=account_name,
+                ))
+        )
+        if message_dto.error_message:
+            raise WrongCommand(message_dto.error_message)
+
+        if not message_dto.message_model:
+            raise WrongCommand('Could not get message_model for message')
         outgoing_message = OutgoingMessage(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
         return self.get_message()
 
     def send_presence(self) -> IncommingMessage:
         if not self.account_name:
-            raise Exception('Empty account_name')
+            raise WrongCommand('Empty account_name')
         message_model = jim.MessageUserPresence(
             user=dict(account_name=self.account_name)
         )
