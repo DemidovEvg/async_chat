@@ -42,8 +42,16 @@ def foo(a: int, b: int) -> int:
     return a + b
 
 
+class A:
+    @log
+    def __init__(self):
+        pass
+
+
 def main():
     foo(a=3, b=4)
+    foo(a=123, b=555)
 
 
 main()
+A()
