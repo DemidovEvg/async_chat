@@ -1,249 +1,194 @@
+import socket
 import signal
 import sys
-from typing import Any, TypeVar
-from pydantic import BaseModel
 import logging
-from async_chat import jim
-from async_chat.server.db import UserService, SessionLocal
+import select
+import time
+import datetime as dt
+from dataclasses import dataclass, field
+from async_chat.server.users_sockets import UsersSockets
 from async_chat.utils import Request, Response
-from async_chat.server.base_server import BaseServerChat
+from async_chat.server.clients import Client, Clients, UsersMessages
+from async_chat.server.response_handler import ResponseHandler
+from async_chat import jim
 
 logger = logging.getLogger('server-logger')
-
-T = TypeVar('T', bound=BaseModel)
 
 
 def handler(signum, frame):
     signame = signal.Signals(signum).name
-    logger.debug(f'Signal handler called with signal {signame} ({signum})')
+    print(f'Signal handler called with signal {signame} ({signum})')
     sys.exit(0)
 
 
-class ServerChat(BaseServerChat):
-    def login_user(self, data: dict[str, Any]) -> Response:
-        message_dto = self.get_message_dto(
-            schema=jim.MessageUserAuth,
-            data=data
+@dataclass
+class Sokets:
+    for_reading: list[socket.socket] = field(default_factory=list)
+    for_writing: list[socket.socket] = field(default_factory=list)
+    for_error: list[socket.socket] = field(default_factory=list)
+
+
+class ServerChat:
+    def __init__(
+        self, port: int,
+        max_users: int,
+        max_data_size: int = 1024,
+        accept_timeout: float = 0.2,
+        select_timeout: float = 10.0
+    ):
+        logger.debug(
+            'Инициализируем сервер используя %s %s',
+            port,
+            max_users
         )
-        if message_dto.error_message:
-            logger.error(
-                f'error={message_dto.error_message} with data={message_dto.json()}'
-            )
-            return Response(message_dto.error_message)
+        self.port = port
+        self.max_users = max_users
+        self.max_data_size = max_data_size
+        self.users_sockets = UsersSockets()
+        self.accept_timeout = accept_timeout
+        self.select_timeout = select_timeout
+        self.clients = Clients()
+        self.sockets = Sokets()
+        self.users_messages = UsersMessages()
+        signal.signal(signal.SIGTERM, handler)
+        signal.signal(signal.SIGINT, self.close_server)
 
-        if not message_dto.message_model:
-            logger.error(
-                f'Could not get message_model for '
-                f'schema=jim.MessageUserAuth '
-                f'for data={data}'
-            )
-            raise Exception('Could not get message_model for message')
+    def close_server(self, signum, frame):
+        signame = signal.Signals(signum).name
+        print(f'Signal handler called with signal {signame} ({signum})')
+        self.chat_socket.close()
+        sys.exit(0)
 
-        message_model: jim.MessageUserAuth = message_dto.message_model
-
-        with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                message_model.user.account_name
-            )
-            if not current_user or not user_service.check_password(
-                user=current_user,
-                password=message_model.user.password
-            ):
-
-                error_message = jim.MessageError(
-                    response=jim.StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN,
-                    error="Bad password or login"
-                ).json()
-                logger.error(
-                    f'Bad password or login for data={data} '
-                )
-                return Response(error_message)
-
-            if user_service.is_online(current_user):
-                error_message = jim.MessageError(
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="User already login"
-                ).json()
-                logger.error(
-                    f'User already login for data={data} '
-                )
-                return Response(error_message)
-            user_service.login(current_user, message_model.time)
-            current_user.address = str(self.current_address)
-            self.users_sockets.add_client(
-                user_id=current_user.id,
-                client=self.current_client
-            )
-            logger.debug(
-                'login_user: %s current_user=%s', message_model, current_user
-            )
-            session.commit()
-        ok_message = jim.MessageAlert(
-            response=jim.StatusCodes.HTTP_200_OK,
-            alert='OK'
-        ).json()
-        return Response(ok_message)
-
-    def logout_user(self, data: dict[str, Any]) -> Response:
-        message_dto = self.get_message_dto(
-            schema=jim.MessageUserQuit,
-            data=data
+    def init_socket(self) -> None:
+        self.chat_socket = socket.socket(
+            family=socket.AF_INET,
+            type=socket.SOCK_STREAM
         )
-        if message_dto.error_message:
-            logger.error(
-                'error=%s with data=%s',
-                message_dto.error_message,
-                message_dto.json()
-            )
-            return Response(message_dto.error_message)
+        self.chat_socket.bind(('localhost', self.port))
+        self.chat_socket.listen(self.max_users)
+        self.chat_socket.settimeout(self.accept_timeout)
 
-        if not message_dto.message_model:
-            logger.error(
-                'Could not get message_model for '
-                'schema=jim.MessageUserQuit '
-                'for data=%s',
-                data
-            )
-            raise Exception('Could not get message_model for message')
-
-        message_model: jim.MessageUserQuit = message_dto.message_model
-
-        with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                message_model.user.account_name
-            )
-            if not current_user:
-                error_message = jim.MessageError(
-                    response=jim.StatusCodes.HTTP_404_NOT_FOUND,
-                    error="Bad account_name"
-                ).json()
-                logger.error(
-                    f'Bad account_name for data={data} '
-                )
-                return Response(error_message)
-            if not user_service.is_online(current_user):
-                error_message = jim.MessageError(
-                    response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                    error="User already offline"
-                ).json()
-                logger.error(
-                    f'User already offline data={data} '
-                )
-                return Response(error_message)
-            user_service.logout(current_user, message_model.time)
-            current_user.address = str(self.current_address)
-            self.users_sockets.drop_client(current_user.id)
-            logger.debug(
-                'logout_user: %s current_user=%s',
-                message_dto,
-                current_user
-            )
-            session.commit()
-
-        ok_message = Request(jim.MessageAlert(
-            response=jim.StatusCodes.HTTP_200_OK,
-            alert='OK'
-        ).json())
-        return Response(ok_message)
-
-    def join_user_to_room(self):
-        pass
-
-    def leave_user_from_room(self):
-        pass
-
-    def processing_presence(self, data: dict[str, Any]) -> Response:
-        message_dto = self.get_message_dto(
-            schema=jim.MessageUserPresence,
-            data=data
-        )
-        if message_dto.error_message:
-            logger.error(
-                f'error={message_dto.error_message} with data={message_dto.json()}'
-            )
-            return Response(message_dto.error_message)
-
-        if not message_dto.message_model:
-            logger.error(
-                f'Could not get message_model for '
-                f'schema=jim.MessageUserPresence '
-                f'for data={data}'
-            )
-            raise Exception('Could not get message_model for message')
-
-        message_model: jim.MessageUserPresence = message_dto.message_model
-        with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                account_name=message_model.user.account_name
-            )
-            if not current_user:
-                error_response = Response(jim.MessageError(
-                    response=jim.StatusCodes.HTTP_404_NOT_FOUND,
-                    error='User not found'
-                ).json())
-                logger.error(
-                    f'User not found for data={data} '
-                )
-                return error_response
-
-            if not user_service.is_online(user=current_user):
-                error_response = Response(jim.MessageError(
-                    response=jim.StatusCodes.HTTP_401_UNAUTHORIZED,
-                    error='Auth required'
-                ).json())
-                logger.error(
-                    f'Auth required for data={data} '
-                )
-                return error_response
-            user_service.presence(
-                user=current_user,
-                time=message_model.time
-            )
-            current_user.address = str(self.current_address)
-            logger.debug(
-                'processing_presence: %s current_user=%s',
-                message_dto,
-                current_user
-            )
-            session.commit()
-        return Response(jim.MessageAlert(
-            response=jim.StatusCodes.HTTP_202_ACCEPTED,
-            alert='Presense accepted'
-        ).json())
-
-    def dispatch(self, incomming_data: dict[str, Any]) -> Response:
-        action = incomming_data.get('action')
+    @classmethod
+    def get_sockets(cls, clients: Clients, timeout: float) -> None | Sokets:
         try:
-            if not action:
-                logger.error(
-                    f'Field action is required for incomming_data={incomming_data} '
-                )
-                return Response(jim.MessageError(
-                    response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                    error='Field action is required'
-                ).json())
-            if action == 'authenticate':
-                return self.login_user(data=incomming_data)
-            elif action == 'presense':
-                return self.processing_presence(data=incomming_data)
-            elif action == 'quit':
-                return self.logout_user(data=incomming_data)
-            else:
-                logger.error(
-                    f'Unknown action for incomming_data={incomming_data} '
-                )
-                return Response(jim.MessageError(
-                    response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                    error='Unknown action'
-                ).json())
-        except Exception as exc:
-            logger.error(
-                f'ERROR={exc} for incomming_data={incomming_data} '
+            r, w, e = select.select(
+                clients,
+                clients,
+                [],
+                timeout
             )
-            return Response(jim.MessageError(
-                response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                error=str(exc)
-            ).json())
+        except OSError:
+            return
+        return Sokets(for_reading=r, for_writing=w, for_error=e)
+
+    def get_request(self, client: socket.socket) -> Request:
+        incomming_bytes_data = client.recv(self.max_data_size)
+        request = Request(incomming_bytes_data.decode())
+        logger.debug('get_request: %s', request)
+        return request
+
+    def get_requests(self, sockets: Sokets) -> dict[socket.socket, Request]:
+        requests = {}
+        for sock in sockets.for_reading:
+            try:
+                requests[sock] = self.get_request(sock)
+            except Exception:
+                logger.debug(
+                    'Клиент %s %s отключился',
+                    sock.fileno(),
+                    sock.getpeername()
+                )
+                self.clients.remove(sock)
+        return requests
+
+    def send_response(self, sock: socket.socket, response: Response) -> None:
+        try:
+            logger.debug(
+                'send_response %s %s response=%s',
+                sock.fileno(),
+                sock.getpeername(),
+                response
+            )
+            sock.send(response.encode())
+        except OSError:
+            logger.debug(
+                'Клиент %s %s отключился',
+                sock.fileno(),
+                sock.getpeername()
+            )
+            sock.close()
+            self.clients.remove(sock)
+
+    def send_messages(self, sock: socket.socket, messages: list[str]) -> None:
+        for message in messages:
+            self.send_response(sock, Response(message))
+
+    def processing_queues_messages(
+        self,
+        sockets: Sokets
+    ) -> None:
+        for sock in sockets.for_writing:
+            # import pdb
+            # pdb.set_trace()
+            client = self.clients.get_client_by_socket(sock)
+            messages = []
+            if client and client.user_id:
+                messages = self.users_messages.get_all_messages_from_queue_for_user(
+                    user_id=client.user_id
+                )
+            if client and not client.user_id:
+                messages = self.users_messages.get_all_messages_from_queue_for_socket(
+                    sock
+                )
+            if (client
+                and client.user_id
+                and not messages
+                    and client.time + dt.timedelta(seconds=60) < dt.datetime.now()):
+                client.time = dt.datetime.now()
+                messages.append(jim.MessageProbe().json())
+            logger.debug(
+                'Отправляем сообщения для юзера user_id=%s', client.user_id
+            )
+            self.send_messages(sock, messages)
+
+    def run(self) -> None:
+        logger.debug('Старт цикла')
+        while True:
+            try:
+                sock, addr = self.chat_socket.accept()
+                logger.debug('Получен сокет %s', sock)
+            except OSError:
+                ...
+                # logger.debug('Timeout ожидания подключений вышел')
+            else:
+                logger.debug('Получен запрос на соединение от %s', addr)
+                # logger.debug(f'{id(sock)}')
+                self.clients.append(Client(socket=sock))
+            finally:
+                sockets = self.__class__.get_sockets(
+                    clients=self.clients,
+                    timeout=self.select_timeout
+                )
+
+            if not sockets:
+                continue
+            requests = self.get_requests(sockets)
+            logger.debug('requests=%s', requests)
+            if requests:
+                self.dispatch_requests(requests)
+            self.processing_queues_messages(sockets)
+            time.sleep(2)
+
+    def dispatch_requests(self, requests: dict[socket.socket, Request]) -> None:
+        for sock, request in requests.items():
+            if not request:
+                continue
+            logger.debug(
+                'Пришел новый запрос request=%s', request
+            )
+            client = self.clients.get_client_by_socket(sock)
+            response_handler = ResponseHandler(
+                current_client=client,
+                users_messages=self.users_messages
+            )
+            response_handler.processing_request(request)

@@ -12,7 +12,7 @@ def main(port: int, max_users: int):
         max_users=max_users
     )
     server_chat.init_socket()
-    server_chat.start_loop()
+    server_chat.run()
 
 
 if __name__ == '__main__':
