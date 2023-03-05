@@ -18,13 +18,6 @@ from async_chat.utils import get_message_dto_
 logger = logging.getLogger('client-logger')
 
 
-def handler(signum, frame, callback):
-    signame = signal.Signals(signum).name
-    print(f'Signal handler called with signal {signame} ({signum})')
-    callback()
-    sys.exit(0)
-
-
 class ClientChat:
     def __init__(
             self,

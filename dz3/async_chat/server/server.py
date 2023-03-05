@@ -128,8 +128,6 @@ class ServerChat:
         sockets: Sokets
     ) -> None:
         for sock in sockets.for_writing:
-            # import pdb
-            # pdb.set_trace()
             client = self.clients.get_client_by_socket(sock)
             messages = []
             if client and client.user_id:
@@ -162,7 +160,6 @@ class ServerChat:
                 # logger.debug('Timeout ожидания подключений вышел')
             else:
                 logger.debug('Получен запрос на соединение от %s', addr)
-                # logger.debug(f'{id(sock)}')
                 self.clients.append(Client(socket=sock))
             finally:
                 sockets = self.__class__.get_sockets(
