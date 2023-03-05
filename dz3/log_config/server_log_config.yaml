@@ -3,12 +3,12 @@ formatters:
   simple:
     format: '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
   server-format: 
-    format: 'address=%(address)s - %(levelname)s - %(asctime)s - %(name)s - %(message)s'
+    format: '%(levelname)s - %(asctime)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: simple
+    formatter: server-format
     stream: ext://sys.stdout
   server-file:
     class: log_config.server_rotating_file_handler.ServerRotatingFileHandler

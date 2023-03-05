@@ -27,13 +27,12 @@ class User(Base):
     message_time: Mapped[Optional[dt.datetime]]
     logout_time: Mapped[Optional[dt.datetime]]
     has_entered: Mapped[Optional[bool]] = mapped_column(default=False)
-    address: Mapped[Optional[str]]
 
     def __repr__(self):
         return (
             f'User(id={self.id}, account_name={self.account_name}),'
             f' message_time={self.message_time}, logout_time={self.logout_time},'
-            f' has_entered={self.has_entered}, address={self.address}'
+            f' has_entered={self.has_entered}'
         )
 
     def is_online(self):
@@ -54,9 +53,9 @@ Base.metadata.create_all(bind=engine)
 
 with Session(engine) as session:
     users = [
-        User(account_name='Ivan', password='ivan123'),
-        User(account_name='Oleg', password='oleg123'),
-        User(account_name='Petr', password='oleg123'),
+        User(account_name='Ivan1', password='ivan123'),
+        User(account_name='Ivan2', password='ivan123'),
+        User(account_name='Ivan3', password='ivan123'),
     ]
     session.add_all(users)
     session.commit()
