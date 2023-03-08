@@ -4,18 +4,31 @@ import re
 import signal
 import ipaddress
 import logging
-import asyncio
+import datetime as dt
 from typing import Any
 import json
+from pydantic import ValidationError
 from async_chat import jim
 from async_chat.utils import (
     WrongCommand,
-    IncommingMessage,
-    OutgoingMessage,
 )
 from async_chat.utils import get_message_dto_
+from async_chat.client.console import ConsoleServer
+from async_chat.settings import DEFAULT_ROOM
+
 
 logger = logging.getLogger('client-logger')
+
+
+class Timer:
+    def restart(self, seconds: int):
+        self.start = dt.datetime.now()
+        self.delta = dt.timedelta(seconds=seconds)
+
+    def time_is_over(self):
+        if self.start + self.delta < dt.datetime.now():
+            return True
+        return False
 
 
 class ClientChat:
@@ -25,17 +38,19 @@ class ClientChat:
             password: str | None,
             ip_address: str,
             port: int,
-            max_data_size: int = 1024
     ):
         self.account_name = account_name
         self.password = password
         self.port = port
         self.ip_address = ipaddress.ip_address(ip_address)
-        self.max_data_size = max_data_size
-        self.is_entered = False
-        socket.setdefaulttimeout(1)
+        self.message_head_size = 4
         signal.signal(signal.SIGTERM, self.close_client)
         signal.signal(signal.SIGINT, self.close_client)
+        self.console = ConsoleServer(
+            account_name=self.account_name,
+            password=self.password
+        )
+        self.room = DEFAULT_ROOM
 
     def close_client(self, signum, frame):
         signame = signal.Signals(signum).name
@@ -50,32 +65,36 @@ class ClientChat:
         )
         self._chat_socket = socket.create_connection(
             (str(self.ip_address), self.port))
+        self._chat_socket.setblocking(0)
 
     def reconnect_to_server(self) -> None:
         self._chat_socket = socket.create_connection(
             (str(self.ip_address), self.port)
         )
 
+    def get_message_size(self, head: str) -> int:
+        return int(head, 16)
+
     def get_incomming_message(self) -> str | None:
-        incomming_message = None
         try:
-            incomming_message = self._chat_socket.recv(
-                self.max_data_size).decode()
-        except ConnectionError as exc:
-            logger.error(
-                f'Пробуем переподключиться так как exc={str(exc)}'
+            message_head = (
+                self._chat_socket.recv(self.message_head_size).decode()
             )
-            self.close_socket()
+            if len(message_head) == 0:
+                return
+            message_size = self.get_message_size(message_head)
+            incomming_message = (
+                self._chat_socket.recv(message_size).decode()
+            )
+        except BlockingIOError:
+            return
+        except ConnectionResetError:
+            logger.debug('Сокет закрыт')
             self.reconnect_to_server()
-            incomming_message = self._chat_socket.recv(
-                self.max_data_size).decode()
-        except TimeoutError:
-            pass
-        if incomming_message:
-            logger.debug('get_incomming_message: %s', incomming_message)
+        logger.debug('get_incomming_message: %s', incomming_message)
         return incomming_message
 
-    def processing_incomming_message(self, incomming_message: str) -> None:
+    def processing_incomming_message(self, incomming_message: str) -> dict[str, Any] | None:
         try:
             incomming_data: dict[str, Any] = json.loads(incomming_message)
         except json.decoder.JSONDecodeError as exc:
@@ -88,7 +107,7 @@ class ClientChat:
         return incomming_data
 
     def dispatch_incomming_data(self, incomming_data: dict[str, Any]) -> None:
-        logger.debug('dispatch_incomming_data')
+        logger.debug('dispatch_incomming_data %s', incomming_data)
         alert = incomming_data.get('alert')
         if alert:
             logger.info('dispatch_incomming_data: %s', incomming_data)
@@ -105,7 +124,7 @@ class ClientChat:
                     f'Action not exist={incomming_data} '
                 )
             elif action == 'probe':
-                self.send_presence()
+                self.action_send_presence()
             elif action == 'msg':
                 self.print_message(incomming_data)
             else:
@@ -118,21 +137,27 @@ class ClientChat:
             )
 
     def print_message(self, incomming_data: str) -> None:
-        logger.debug('Пришло сообщение: %s', incomming_data['message'])
+        print(f'Пришло сообщение: {incomming_data["message"]}')
 
-    def send_outgoing_message(self, outgoing_message: OutgoingMessage) -> None:
-        logger.debug('send_outgoing_message: %s', outgoing_message)
+    def form_data(self, data: str) -> bytes:
+        length = len(data.encode())
+        hex_legth = hex(length)[2:]
+        head_message = f'00{hex_legth}'[-4:]
+        return f'{head_message}{data}'.encode()
+
+    def send_outgoing_message(self, outgoing_message: str) -> None:
 
         try:
             if self._chat_socket._closed:
                 logger.debug('Сокет был закрыт, переподключаемся')
                 self.reconnect_to_server()
-            self._chat_socket.send(outgoing_message.encode())
+            data = self.form_data(outgoing_message)
+            logger.debug('send_outgoing_message: %s', data.decode())
+            self._chat_socket.send(data)
         except OSError as exc:
             logger.error('OSError= %s', str(exc))
             self.close_socket()
             self.reconnect_to_server()
-            self._chat_socket.send(outgoing_message.encode())
 
     def close_socket(self) -> None:
         if hasattr(self, '_chat_socket'):
@@ -162,101 +187,87 @@ class ClientChat:
             print(
                 f'account_name={self.account_name} new_account_name={new_account_name}'
             )
-            self.logout(account_name=self.account_name)
+            self.action_logout(account_name=self.account_name)
 
         self.account_name = new_account_name
         self.password = new_password
+        self.console.set_account_name(new_account_name)
+        self.console.set_password(new_password)
 
-    async def ainput(self) -> str:
-        password_mask = self.password and "*" * len(self.password)
-        message = f'Команда(account_name={self.account_name}) entered={self.is_entered} password={password_mask}: '
-        await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda message=message: sys.stdout.write(message)
-        )
-        return await asyncio.get_event_loop().run_in_executor(
-            None,
-            sys.stdin.readline
-        )
-
-    def run(self):
-        asyncio.run(self.main_loop())
-
-    async def incomming_messages_loop(self):
-        self.connect_to_server()
+    def start_client(self):
+        self.console.start()
         while True:
-            logger.debug('incomming_messages_loop: тик-так')
+            try:
+                self.connect_to_server()
+                break
+            except ConnectionRefusedError:
+                logger.info('Неудачное подключение к серверу')
+
+        while True:
+            if not self.console.is_commands_queue_empty():
+                command = self.console.get_command()
+                print(f'Получили новую команду {command}')
+                try:
+                    self.processing_command(command)
+                    self.console.go()
+                except WrongCommand as exc:
+                    self.console.put_error(str(exc))
+                except SystemExit:
+                    logger.debug('Выходим')
+                    self.close_socket()
+                    return
+
+            # logger.debug('incomming_messages_loop: тик-так')
             incomming_message = self.get_incomming_message()
-            print(incomming_message)
             if incomming_message:
                 incomming_data = self.processing_incomming_message(
                     incomming_message
                 )
-                self.dispatch_incomming_data(incomming_data)
-            await asyncio.sleep(3)
-
-    def print_help(self) -> None:
-        print('Допустимые команды:')
-        print('- help')
-        print('- login --account_name=Ivan1 --password=ivan123')
-        print('- logout')
-        print('- exit')
-        print('- presence')
-        print('- message all "Привет всем"')
-
-    async def main_loop(self) -> None:
-        asyncio.create_task(self.incomming_messages_loop())
-        self.print_help()
-        while True:
-            console_task = asyncio.create_task(self.ainput())
-            command = await console_task
-            try:
-                self.processing_command(command)
-            except SystemExit:
-                logger.debug('Выходим')
-                self.close_socket()
-                return
+                if incomming_data:
+                    self.dispatch_incomming_data(incomming_data)
 
     def processing_command(self, command: str) -> None:
         logger.debug('Input command=%s for=%s', command, self.account_name)
         try:
-            if 'help' in command:
-                self.print_help()
-            elif 'login' in command:
+            if 'login' in command:
                 self.sync_account_name_and_password_from_command(
                     command
                 )
-                self.login(
+                self.action_login(
                     account_name=str(self.account_name),
                     password=str(self.password)
                 )
             elif 'logout' in command:
-                self.logout(
+                self.action_logout(
                     account_name=str(self.account_name)
                 )
             elif 'presence' in command:
-                self.send_presence()
+                self.action_send_presence()
             elif 'message' in command:
-                _, target, message_words = command.split()
-                message = ''.join(message_words)
-                self.send_message(target, message)
+                _, target, *message_words = command.split()
+                message = ' '.join(message_words)
+                self.action_send_message(target, message)
+            elif 'join' in command:
+                _, room, *_ = command.split()
+                self.action_join(room)
+            elif 'leave' in command:
+                self.action_leave()
             elif 'exit' in command:
                 try:
-                    self.logout(
+                    self.action_logout(
                         account_name=str(self.account_name)
                     )
                 except OSError as exc:
-                    print('ERROR: ' + str(exc))
+                    logger.error('ERROR: ' + str(exc))
             else:
-                print(f'Не валидная команда {command}, попробуйте еще раз!')
-                print('======================')
+                raise WrongCommand(
+                    f'Не валидная команда {command}, попробуйте еще раз!'
+                )
         except (OSError, WrongCommand) as exc:
-            print('ERROR: ' + str(exc))
-            print('======================')
             logger.error('ERROR: %s', str(exc))
-            self.print_help()
+            raise WrongCommand(str(exc))
 
-    def login(self, account_name: str, password: str) -> IncommingMessage:
+    def action_login(self, account_name: str, password: str) -> None:
         if not account_name or not password:
             raise Exception('Empty account_name or password')
 
@@ -275,26 +286,33 @@ class ClientChat:
             raise WrongCommand('Could not get message_model for message')
 
         message_model: jim.MessageUserAuth = message_dto.message_model
-        outgoing_message = OutgoingMessage(message_model.json())
+        outgoing_message = str(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
         incomming_message = ''
-        while not incomming_message:
+        timer = Timer()
+        timer.restart(seconds=5)
+        while not incomming_message and not timer.time_is_over():
             incomming_message = self.get_incomming_message()
-        if incomming_message:
-            incomming_data = self.processing_incomming_message(
-                incomming_message
-            )
-            if incomming_data.get('alert') and incomming_data.get('alert').upper() == 'OK':
-                self.is_entered = True
-                logger.debug('Вход удачный')
 
-    def logout(self, account_name: str) -> IncommingMessage:
+        if not incomming_message:
+            logger.debug('Вход НЕ удачный')
+            return
+        incomming_data = self.processing_incomming_message(
+            incomming_message
+        )
+        if not incomming_data:
+            logger.debug('Вход НЕ удачный')
+            return
+        if incomming_data.get('alert') and incomming_data.get('alert').upper() == 'OK':
+            logger.debug('Вход удачный')
+            self.console.set_is_entered(True)
+
+    def action_logout(self, account_name: str) -> None:
         message_model = jim.MessageUserQuit(
             user=dict(
                 account_name=account_name,
             )
         )
-
         message_dto = get_message_dto_(
             schema=jim.MessageUserQuit,
             data=dict(
@@ -307,16 +325,15 @@ class ClientChat:
 
         if not message_dto.message_model:
             raise WrongCommand('Could not get message_model for message')
-        outgoing_message = OutgoingMessage(message_model.json())
+        outgoing_message = str(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
         incomming_message = self.get_incomming_message()
         try:
             is_ok = self.check_ok(incomming_message)
+            self.console.set_is_entered(False)
             if is_ok:
                 raise SystemExit()
         except Exception as exc:
-            import pdb
-            pdb.set_trace()
             logger.debug('Выход не удачный %s', str(exc))
 
     def check_ok(self, incomming_message: str) -> bool:
@@ -328,23 +345,89 @@ class ClientChat:
             if alert_model.alert == 'OK':
                 return True
 
-    def send_presence(self):
+    def action_send_presence(self) -> None:
         if not self.account_name:
             raise WrongCommand('Empty account_name')
         message_model = jim.MessageUserPresence(
             user=dict(account_name=self.account_name)
         )
-        outgoing_message = OutgoingMessage(message_model.json())
+        outgoing_message = str(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
 
-    def send_message(self, target: str, message: str) -> IncommingMessage:
+    def action_send_message(self, target: str, message: str) -> None:
         if not self.account_name:
             raise WrongCommand('Empty account_name')
-
-        message_model = jim.MessageSendMessage(
-            from_=self.account_name,
-            to_=target,
-            message=message
-        )
-        outgoing_message = OutgoingMessage(message_model.json())
+        if target == '#':
+            target = f'#{self.room}'
+        try:
+            message_model = jim.MessageSendMessage(
+                from_=self.account_name,
+                to_=target,
+                message=message
+            )
+        except ValidationError as exc:
+            raise WrongCommand(str(exc))
+        outgoing_message = str(message_model.json())
         self.send_outgoing_message(outgoing_message=outgoing_message)
+
+    def action_join(self, room: str) -> None:
+        if not room:
+            raise WrongCommand('Empty room')
+        try:
+            message_model = jim.MessageUserJoinRoom(
+                room=room,
+                user=dict(
+                    account_name=self.account_name,
+                )
+            )
+        except ValidationError as exc:
+            raise WrongCommand(str(exc))
+        outgoing_message = str(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
+        incomming_message = ''
+        timer = Timer()
+        timer.restart(seconds=5)
+        while not incomming_message and not timer.time_is_over():
+            incomming_message = self.get_incomming_message()
+
+        if not incomming_message:
+            logger.debug('Вход в комнату НЕ удачный')
+            return
+        incomming_data = self.processing_incomming_message(
+            incomming_message
+        )
+        if not incomming_data:
+            logger.debug('Вход в комнату НЕ удачный')
+            return
+        if incomming_data.get('alert') and incomming_data.get('alert').upper() == 'OK':
+            logger.debug('Вход в комнату удачный')
+            self.room = room
+            self.console.set_room(room)
+
+    def action_leave(self) -> None:
+        message_model = jim.MessageUserLeaveRoom(
+            user=dict(
+                account_name=self.account_name,
+            )
+        )
+        outgoing_message = str(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
+        incomming_message = ''
+        timer = Timer()
+        timer.restart(seconds=5)
+        while not incomming_message and not timer.time_is_over():
+            incomming_message = self.get_incomming_message()
+
+        if not incomming_message:
+            logger.debug('Не смогли выйти из комнаты')
+            return
+        incomming_data = self.processing_incomming_message(
+            incomming_message
+        )
+        if not incomming_data:
+            logger.debug('Не смогли выйти из комнаты')
+            return
+        if incomming_data.get('alert') and incomming_data.get('alert').upper() == 'OK':
+            logger.debug('Удачно вышли из комнаты')
+            self.room = DEFAULT_ROOM
+            self.console.set_room(self.room)

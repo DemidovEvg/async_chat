@@ -23,7 +23,7 @@ def main(
         ip_address=ip_address,
         port=port
     )
-    client_chat.run()
+    client_chat.start_client()
 
 
 if __name__ == '__main__':

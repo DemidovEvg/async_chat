@@ -1,5 +1,5 @@
 from typing import NewType, Any, Generic, TypeVar
-from . import jim
+from async_chat import jim
 from typing import Type
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
@@ -13,7 +13,7 @@ Request = NewType('Request', str)
 Response = NewType('Response', str)
 
 IncommingMessage = NewType('IncommingMessage', str)
-OutgoingMessage = NewType('OutgoingMessage', str)
+str = NewType('OutgoingMessage', str)
 
 T = TypeVar('T', bound=BaseModel)
 
