@@ -28,7 +28,7 @@ class TestCommandLineClientChat(unittest.TestCase):
             ip_address=self.ip_address,
             port=self.port
         )
-        client_chat.logout = MagicMock(
+        client_chat.action_logout = MagicMock(
             return_value=None
         )
         with self.assertRaises(SystemExit):
@@ -39,7 +39,7 @@ class TestCommandLineClientChat(unittest.TestCase):
                 raise
         output = stdout.getvalue()
         self.assertIn('Допустимые команды:', output)
-        client_chat.logout.assert_called_once()
+        client_chat.action_logout.assert_called_once()
 
     @patch('builtins.input', side_effect=[
         'login --account_name=test --password=test',
@@ -53,10 +53,10 @@ class TestCommandLineClientChat(unittest.TestCase):
             ip_address=self.ip_address,
             port=self.port
         )
-        client_chat.login = MagicMock(
+        client_chat.action_login = MagicMock(
             side_effect=None
         )
-        client_chat.logout = MagicMock(
+        client_chat.action_logout = MagicMock(
             return_value=None
         )
         with self.assertRaises(SystemExit):
@@ -68,11 +68,11 @@ class TestCommandLineClientChat(unittest.TestCase):
         self.assertEqual(client_chat.account_name, 'test')
         self.assertEqual(client_chat.password, 'test')
 
-        client_chat.login.assert_any_call(
+        client_chat.action_login.assert_any_call(
             account_name='test',
             password='test'
         )
-        client_chat.logout.assert_called()
+        client_chat.action_logout.assert_called()
 
     @patch('builtins.input', side_effect=[
         'presence',
@@ -86,10 +86,10 @@ class TestCommandLineClientChat(unittest.TestCase):
             ip_address=self.ip_address,
             port=self.port
         )
-        client_chat.send_presence = MagicMock(
+        client_chat.action_send_presence = MagicMock(
             side_effect=None
         )
-        client_chat.logout = MagicMock(
+        client_chat.action_logout = MagicMock(
             return_value=None
         )
         with self.assertRaises(SystemExit):
@@ -99,8 +99,8 @@ class TestCommandLineClientChat(unittest.TestCase):
                 self.assertEqual(str(exc), '0')
                 raise
 
-        client_chat.send_presence.assert_called_once()
-        client_chat.logout.assert_called()
+        client_chat.action_send_presence.assert_called_once()
+        client_chat.action_logout.assert_called()
 
     @patch('builtins.input', side_effect=[
         'logout',
@@ -114,7 +114,7 @@ class TestCommandLineClientChat(unittest.TestCase):
             ip_address=self.ip_address,
             port=self.port
         )
-        client_chat.logout = MagicMock(
+        client_chat.action_logout = MagicMock(
             return_value=None
         )
         with self.assertRaises(SystemExit):
@@ -123,4 +123,4 @@ class TestCommandLineClientChat(unittest.TestCase):
             except SystemExit as exc:
                 self.assertEqual(str(exc), '0')
                 raise
-        client_chat.logout.assert_called()
+        client_chat.action_logout.assert_called()

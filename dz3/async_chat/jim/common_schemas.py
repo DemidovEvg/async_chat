@@ -1,8 +1,12 @@
 from pydantic import BaseModel, Field
 import datetime as dt
+import uuid
 
 
 class TimeBase(BaseModel):
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid1())
+    )
     time: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )

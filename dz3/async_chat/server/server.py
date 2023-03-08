@@ -3,22 +3,15 @@ import signal
 import sys
 import logging
 import select
-import time
+# import time
 import datetime as dt
 from dataclasses import dataclass, field
-from async_chat.server.users_sockets import UsersSockets
 from async_chat.utils import Request, Response
-from async_chat.server.clients import Client, Clients, UsersMessages
+from async_chat.server.clients import Client, Clients
 from async_chat.server.response_handler import ResponseHandler
 from async_chat import jim
 
 logger = logging.getLogger('server-logger')
-
-
-def handler(signum, frame):
-    signame = signal.Signals(signum).name
-    print(f'Signal handler called with signal {signame} ({signum})')
-    sys.exit(0)
 
 
 @dataclass
@@ -32,7 +25,6 @@ class ServerChat:
     def __init__(
         self, port: int,
         max_users: int,
-        max_data_size: int = 1024,
         accept_timeout: float = 0.2,
         select_timeout: float = 10.0
     ):
@@ -43,19 +35,17 @@ class ServerChat:
         )
         self.port = port
         self.max_users = max_users
-        self.max_data_size = max_data_size
-        self.users_sockets = UsersSockets()
         self.accept_timeout = accept_timeout
         self.select_timeout = select_timeout
         self.clients = Clients()
         self.sockets = Sokets()
-        self.users_messages = UsersMessages()
-        signal.signal(signal.SIGTERM, handler)
+        self.message_head_size = 4
+        signal.signal(signal.SIGTERM, self.close_server)
         signal.signal(signal.SIGINT, self.close_server)
 
     def close_server(self, signum, frame):
         signame = signal.Signals(signum).name
-        print(f'Signal handler called with signal {signame} ({signum})')
+        logger.info(f'Signal handler called with signal {signame} ({signum})')
         self.chat_socket.close()
         sys.exit(0)
 
@@ -81,15 +71,26 @@ class ServerChat:
             return
         return Sokets(for_reading=r, for_writing=w, for_error=e)
 
-    def get_request(self, client: socket.socket) -> Request:
-        incomming_bytes_data = client.recv(self.max_data_size)
-        request = Request(incomming_bytes_data.decode())
+    def get_message_size(self, head: str) -> int:
+        return int(head, 16)
+
+    def get_request(self, sock: socket.socket) -> Request:
+        message_head = (
+            sock.recv(self.message_head_size).decode()
+        )
+        if len(message_head) == 0:
+            return
+        message_size = self.get_message_size(message_head)
+        request = Request(
+            sock.recv(message_size).decode()
+        )
         logger.debug('get_request: %s', request)
         return request
 
     def get_requests(self, sockets: Sokets) -> dict[socket.socket, Request]:
         requests = {}
         for sock in sockets.for_reading:
+            client = self.clients.get_client_by_socket(sock)
             try:
                 requests[sock] = self.get_request(sock)
             except Exception:
@@ -98,30 +99,41 @@ class ServerChat:
                     sock.fileno(),
                     sock.getpeername()
                 )
-                self.clients.remove(sock)
+                client.socket.close()
+                self.clients.remove(client)
         return requests
 
-    def send_response(self, sock: socket.socket, response: Response) -> None:
+    def form_data(self, data: str) -> bytes:
+        length = len(data.encode())
+        hex_legth = hex(length)[2:]
+        head_message = f'00{hex_legth}'[-4:]
+        return f'{head_message}{data}'.encode()
+
+    def send_response(self, client: Client, response: Response) -> None:
         try:
             logger.debug(
                 'send_response %s %s response=%s',
-                sock.fileno(),
-                sock.getpeername(),
+                client.socket.fileno(),
+                client.socket.getpeername(),
                 response
             )
-            sock.send(response.encode())
+            client.socket.send(self.form_data(str(response)))
         except OSError:
             logger.debug(
                 'Клиент %s %s отключился',
-                sock.fileno(),
-                sock.getpeername()
+                client.socket.fileno(),
+                client.socket.getpeername()
             )
-            sock.close()
-            self.clients.remove(sock)
+            if client.user_id:
+                self.clients.users_messages.put_back_message_to_queue(
+                    str(response))
 
-    def send_messages(self, sock: socket.socket, messages: list[str]) -> None:
-        for message in messages:
-            self.send_response(sock, Response(message))
+            client.socket.close()
+            self.clients.remove(client)
+
+    def send_message(self, client: Client, message: str) -> None:
+        if message:
+            self.send_response(client, Response(message))
 
     def processing_queues_messages(
         self,
@@ -129,25 +141,33 @@ class ServerChat:
     ) -> None:
         for sock in sockets.for_writing:
             client = self.clients.get_client_by_socket(sock)
-            messages = []
-            if client and client.user_id:
-                messages = self.users_messages.get_all_messages_from_queue_for_user(
-                    user_id=client.user_id
+            message = None
+            if not client:
+                continue
+            if client.user_id:
+                message = self.clients.users_messages.get_message_from_queue(
+                    target=client.user_id
                 )
-            if client and not client.user_id:
-                messages = self.users_messages.get_all_messages_from_queue_for_socket(
-                    sock
+            if not message:
+                message = self.clients.users_messages.get_message_from_queue(
+                    target=sock
                 )
-            if (client
-                and client.user_id
-                and not messages
-                    and client.time + dt.timedelta(seconds=60) < dt.datetime.now()):
+            if (client.user_id
+                and not message
+                    and client.time + dt.timedelta(seconds=20) < dt.datetime.now()):
                 client.time = dt.datetime.now()
-                messages.append(jim.MessageProbe().json())
-            logger.debug(
-                'Отправляем сообщения для юзера user_id=%s', client.user_id
-            )
-            self.send_messages(sock, messages)
+                message = jim.MessageProbe().json()
+
+            if client.user_id and message:
+                logger.debug(
+                    'Отправляем сообщения для юзера user_id=%s', client.user_id
+                )
+            else:
+                logger.debug(
+                    'Отправляем сообщения для sock=%s', sock
+                )
+
+            self.send_message(client, message)
 
     def run(self) -> None:
         logger.debug('Старт цикла')
@@ -167,6 +187,8 @@ class ServerChat:
                     timeout=self.select_timeout
                 )
 
+            print(self.clients)
+
             if not sockets:
                 continue
             requests = self.get_requests(sockets)
@@ -174,7 +196,6 @@ class ServerChat:
             if requests:
                 self.dispatch_requests(requests)
             self.processing_queues_messages(sockets)
-            time.sleep(2)
 
     def dispatch_requests(self, requests: dict[socket.socket, Request]) -> None:
         for sock, request in requests.items():
@@ -186,6 +207,6 @@ class ServerChat:
             client = self.clients.get_client_by_socket(sock)
             response_handler = ResponseHandler(
                 current_client=client,
-                users_messages=self.users_messages
+                clients=self.clients
             )
             response_handler.processing_request(request)

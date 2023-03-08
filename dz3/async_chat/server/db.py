@@ -52,11 +52,12 @@ Base.metadata.create_all(bind=engine)
 
 
 with Session(engine) as session:
-    users = [
-        User(account_name='Ivan1', password='ivan123'),
-        User(account_name='Ivan2', password='ivan123'),
-        User(account_name='Ivan3', password='ivan123'),
-    ]
+    users = []
+    for i in range(10000):
+        users.append(
+            User(account_name=f'Ivan{i}', password='ivan123')
+        )
+
     session.add_all(users)
     session.commit()
 
@@ -64,6 +65,10 @@ with Session(engine) as session:
 class UserService:
     def __init__(self, session: Session):
         self.session = session
+
+    def get_all_users_ids(self) -> list[int]:
+        ids = self.session.scalars(select(User.id).select_from(User)).all()
+        return ids
 
     def get_user_by_account_name(self, account_name: str) -> User | None:
         return self.session.scalars(
@@ -78,14 +83,32 @@ class UserService:
     def check_password(self, user: User, password: str) -> bool:
         return user.check_password(password)
 
-    def login(self, user: User, time: dt.datetime) -> None:
-        user.has_entered = True
-        user.message_time = time
+    def login(self, user: User | int, time: dt.datetime = None) -> None:
+        if not time:
+            time = dt.datetime.now(dt.timezone.utc)
+        if isinstance(user, int):
+            current_user = session.scalars(
+                select(User).filter_by(id=user)
+            ).one()
+        else:
+            current_user = user
+        current_user.has_entered = True
+        current_user.message_time = time
+        session.commit()
 
-    def logout(self, user: User, time: dt.datetime) -> None:
-        user.has_entered = False
-        user.message_time = time
-        user.logout_time = time
+    def logout(self, user: User | int, time: dt.datetime = None) -> None:
+        if not time:
+            time = dt.datetime.now(dt.timezone.utc)
+        if isinstance(user, int):
+            current_user = session.scalars(
+                select(User).filter_by(id=user)
+            ).one()
+        else:
+            current_user = user
+        current_user.has_entered = False
+        current_user.message_time = time
+        current_user.logout_time = time
+        session.commit()
 
     def presence(self, user: User, time: dt.datetime) -> None:
         user.message_time = time

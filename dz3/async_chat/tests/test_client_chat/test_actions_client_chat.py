@@ -32,7 +32,7 @@ class TestActionsClientChat(unittest.TestCase):
             return_value=IncommingMessage('some_message')
         )
 
-        client_chat.login(
+        client_chat.action_login(
             account_name=self.account_name,
             password=self.password
         )
@@ -55,7 +55,7 @@ class TestActionsClientChat(unittest.TestCase):
             return_value=IncommingMessage('some_message')
         )
         with self.assertRaises(Exception):
-            client_chat.login(
+            client_chat.action_login(
                 account_name=None,
                 password=None
             )
@@ -76,7 +76,7 @@ class TestActionsClientChat(unittest.TestCase):
             return_value=IncommingMessage('some_message')
         )
 
-        client_chat.logout(self.account_name)
+        client_chat.action_logout(self.account_name)
         MockMessageUserQuit.assert_called()
         client_chat.send_outgoing_message.assert_called_once()
         client_chat.get_message.assert_called_once()
@@ -96,7 +96,7 @@ class TestActionsClientChat(unittest.TestCase):
             return_value=IncommingMessage('some_message')
         )
 
-        client_chat.send_presence()
+        client_chat.action_send_presence()
         MockMessageUserPresence.assert_called()
         client_chat.send_outgoing_message.assert_called_once()
         client_chat.get_message.assert_called_once()

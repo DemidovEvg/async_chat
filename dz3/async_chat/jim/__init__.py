@@ -5,6 +5,7 @@ from .client_schemas import (
     MessageBaseActionSend,
     MessageSendMessage,
     MessageUserJoinRoom,
+    MessageUserLeaveRoom,
     ClientActions,
     Statuses
 )
@@ -23,6 +24,7 @@ __all__ = [
     'MessageBaseActionSend',
     'MessageSendMessage',
     'MessageUserJoinRoom',
+    'MessageUserLeaveRoom',
     'ClientActions',
     'Statuses',
     'MessageAlert',

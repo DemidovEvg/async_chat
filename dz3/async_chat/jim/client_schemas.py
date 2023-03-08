@@ -57,4 +57,10 @@ class MessageSendMessage(MessageBaseActionSend):
 
 class MessageUserJoinRoom(ActionTimeBase):
     action: str = Field(ClientActions.join_.value, const=True)
-    room: str = Field(min_length=3, max_length=25, regex='^#.*$')  # noqa: F722
+    room: str = Field(min_length=3, max_length=25)
+    user: UserBase
+
+
+class MessageUserLeaveRoom(ActionTimeBase):
+    action: str = Field(ClientActions.leave.value, const=True)
+    user: UserBase

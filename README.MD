@@ -1,4 +1,7 @@
-##async_chat
+##Приложение async_chat
+Состоит из сервера и клиента.
+
+======================================
 Запуск сервера:
 python .\dz3\server_main.py  
 
@@ -6,8 +9,8 @@ python .\dz3\server_main.py
 @click.option('--port', default=3000, type=int)
 @click.option('--max_users', default=5, type=int)
 
+======================================
 Запуск клиента:
-python .\dz3\client_main.py
 python .\dz3\client_main.py --account_name=Ivan --password=ivan123
 
 Опциональные аргументы: 
@@ -16,13 +19,40 @@ python .\dz3\client_main.py --account_name=Ivan --password=ivan123
 @click.option('--ip_address', default='127.0.0.1', type=str)
 @click.option('--port', default=3000, type=int)
 
+======================================
 ###Запуск тестов:
 python -m unittest discover
 
-###Добавлено логирование
+======================================
+###Основные команды клиента:
+Вывести список команд:
+$~~~~~$*help*
 
-### +dz6
-Пример логов в консоли
-2023-03-04 15:44:42,335---Вызвали функцию foo(a: int, b: int) -> int: из I:\python\async_chat\dz6\dz6.py---main---line=52
-2023-03-04 15:44:42,336---Вызвали функцию foo(a: int, b: int) -> int: из I:\python\async_chat\dz6\dz6.py---main---line=53
-2023-03-04 15:44:42,336---Вызвали функцию A.__init__(self): из I:\python\async_chat\dz6\dz6.py---<module>---line=57
+Зайти под конкретным аккаунтом:
+$~~~~~$*login --account_name=Ivan1 --password=ivan123*
+
+Разлогиниться:
+$~~~~~$*logout*
+
+Закрыть клиента:
+$~~~~~$*exit*
+
+Написать сообщение в текущую комнату в которой находится пользователь:
+$~~~~~$*message **#** "Сообщение в текущую комнату"*
+
+Написать сообщение в общую комнату:
+$~~~~~$*message **#common** "Сообщение всем пользователям"*
+
+Написать сообщение в произвольную комнату:
+$~~~~~$*message **#room_name** "Сообщение в другую комнату"*
+
+Написать сообщение конкретному пользователю:
+$~~~~~$*message **Ivan2** "Привет Иван"*
+
+Зайти в комнату:
+$~~~~~$*join **gamers***
+
+Выйти из комнаты:
+$~~~~~$*leave*
+
+Для тестов создается юзеры от Ivan1 до Ivan10000 с паролями ivan123
