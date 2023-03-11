@@ -67,6 +67,9 @@ class Clients:
         self._room_by_user_id: dict[int, str] = {}
         self.default_room = 'common'
 
+    def __len__(self) -> int:
+        return len(self.all_clients)
+
     def get_room_name(self, client: Client):
         if not client.user_id:
             raise Exception('No client.user_id')

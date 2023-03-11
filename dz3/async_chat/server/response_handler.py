@@ -146,7 +146,6 @@ class ResponseHandler:
                 self.put_message_for_current_client(error_message)
                 return
             if user_service.is_online(current_user) and self.current_client.user_id == current_user.id:
-                self.clients.remove_user(current_user.id)
                 error_message = jim.MessageError(
                     response=jim.StatusCodes.HTTP_409_CONFLICT,
                     error="You are already login"
