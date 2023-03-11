@@ -25,8 +25,8 @@ class ServerChat:
     def __init__(
         self, port: int,
         max_users: int,
-        accept_timeout: float = 0.2,
-        select_timeout: float = 10.0
+        accept_timeout: float = 0.02,
+        select_timeout: float = 0.03
     ):
         logger.debug(
             'Инициализируем сервер используя %s %s',
@@ -126,7 +126,9 @@ class ServerChat:
             )
             if client.user_id:
                 self.clients.users_messages.put_back_message_to_queue(
-                    str(response))
+                    client.user_id,
+                    str(response)
+                )
 
             client.socket.close()
             self.clients.remove(client)
@@ -158,14 +160,14 @@ class ServerChat:
                 client.time = dt.datetime.now()
                 message = jim.MessageProbe().json()
 
-            if client.user_id and message:
-                logger.debug(
-                    'Отправляем сообщения для юзера user_id=%s', client.user_id
-                )
-            else:
-                logger.debug(
-                    'Отправляем сообщения для sock=%s', sock
-                )
+            # if client.user_id and message:
+            #     logger.debug(
+            #         'Отправляем сообщения для юзера user_id=%s', client.user_id
+            #     )
+            # else:
+            #     logger.debug(
+            #         'Отправляем сообщения для sock=%s', sock
+            #     )
 
             self.send_message(client, message)
 
@@ -187,12 +189,12 @@ class ServerChat:
                     timeout=self.select_timeout
                 )
 
-            print(self.clients)
+            print(len(self.clients))
 
             if not sockets:
                 continue
             requests = self.get_requests(sockets)
-            logger.debug('requests=%s', requests)
+            logger.debug('requests_len=%s', len(requests))
             if requests:
                 self.dispatch_requests(requests)
             self.processing_queues_messages(sockets)

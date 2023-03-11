@@ -7,6 +7,7 @@ import logging
 import datetime as dt
 from typing import Any
 import json
+import asyncio
 from pydantic import ValidationError
 from async_chat import jim
 from async_chat.utils import (
@@ -51,6 +52,7 @@ class ClientChat:
             password=self.password
         )
         self.room = DEFAULT_ROOM
+        self.counter = 0
 
     def close_client(self, signum, frame):
         signame = signal.Signals(signum).name
@@ -65,7 +67,8 @@ class ClientChat:
         )
         self._chat_socket = socket.create_connection(
             (str(self.ip_address), self.port))
-        self._chat_socket.setblocking(0)
+        self._chat_socket.settimeout(1.0)
+        # self._chat_socket.setblocking(0)
 
     def reconnect_to_server(self) -> None:
         self._chat_socket = socket.create_connection(
@@ -76,10 +79,13 @@ class ClientChat:
         return int(head, 16)
 
     def get_incomming_message(self) -> str | None:
+        self.counter = self.counter + 1
+        # print(f'{self.counter}---{self.account_name}---get_incomming_message')
         try:
             message_head = (
-                self._chat_socket.recv(self.message_head_size).decode()
+                self._chat_socket.recv(self.message_head_size)
             )
+            print(message_head)
             if len(message_head) == 0:
                 return
             message_size = self.get_message_size(message_head)
@@ -87,6 +93,9 @@ class ClientChat:
                 self._chat_socket.recv(message_size).decode()
             )
         except BlockingIOError:
+            # logger.debug('BlockingIOError')
+            return
+        except TimeoutError:
             return
         except ConnectionResetError:
             logger.debug('Сокет закрыт')
@@ -195,7 +204,9 @@ class ClientChat:
         self.console.set_password(new_password)
 
     def start_client(self):
-        self.console.start()
+        asyncio.run(self.main_loop())
+
+    async def main_loop(self):
         while True:
             try:
                 self.connect_to_server()
@@ -203,19 +214,24 @@ class ClientChat:
             except ConnectionRefusedError:
                 logger.info('Неудачное подключение к серверу')
 
+        task_command = asyncio.create_task(self.console.get_command())
         while True:
-            if not self.console.is_commands_queue_empty():
-                command = self.console.get_command()
-                print(f'Получили новую команду {command}')
-                try:
-                    self.processing_command(command)
-                    self.console.go()
-                except WrongCommand as exc:
-                    self.console.put_error(str(exc))
-                except SystemExit:
-                    logger.debug('Выходим')
-                    self.close_socket()
-                    return
+            await asyncio.sleep(0.1)
+            if task_command.done():
+                command = await task_command
+                if command:
+                    print(f'Получили новую команду {command}')
+                    try:
+                        await self.processing_command(command)
+                    except WrongCommand as exc:
+                        print(exc.__repr__())
+                    except SystemExit:
+                        logger.debug('Выходим')
+                        self.close_socket()
+                        return
+                task_command = asyncio.create_task(
+                    self.console.get_command()
+                )
 
             # logger.debug('incomming_messages_loop: тик-так')
             incomming_message = self.get_incomming_message()
@@ -226,14 +242,14 @@ class ClientChat:
                 if incomming_data:
                     self.dispatch_incomming_data(incomming_data)
 
-    def processing_command(self, command: str) -> None:
+    async def processing_command(self, command: str) -> None:
         logger.debug('Input command=%s for=%s', command, self.account_name)
         try:
             if 'login' in command:
                 self.sync_account_name_and_password_from_command(
                     command
                 )
-                self.action_login(
+                await self.action_login(
                     account_name=str(self.account_name),
                     password=str(self.password)
                 )
@@ -267,7 +283,7 @@ class ClientChat:
             logger.error('ERROR: %s', str(exc))
             raise WrongCommand(str(exc))
 
-    def action_login(self, account_name: str, password: str) -> None:
+    async def action_login(self, account_name: str, password: str) -> None:
         if not account_name or not password:
             raise Exception('Empty account_name or password')
 
@@ -292,16 +308,17 @@ class ClientChat:
         timer = Timer()
         timer.restart(seconds=5)
         while not incomming_message and not timer.time_is_over():
+            await asyncio.sleep(0.01)
             incomming_message = self.get_incomming_message()
 
         if not incomming_message:
-            logger.debug('Вход НЕ удачный')
+            logger.debug('Вход НЕ удачный %s', incomming_message)
             return
         incomming_data = self.processing_incomming_message(
             incomming_message
         )
         if not incomming_data:
-            logger.debug('Вход НЕ удачный')
+            logger.debug('Вход НЕ удачный %s', incomming_message)
             return
         if incomming_data.get('alert') and incomming_data.get('alert').upper() == 'OK':
             logger.debug('Вход удачный')
@@ -387,9 +404,11 @@ class ClientChat:
         incomming_message = ''
         timer = Timer()
         timer.restart(seconds=5)
+        print('Перед проверкой ответа от сервера')
         while not incomming_message and not timer.time_is_over():
             incomming_message = self.get_incomming_message()
 
+        print('После проверки ответа от сервера')
         if not incomming_message:
             logger.debug('Вход в комнату НЕ удачный')
             return
