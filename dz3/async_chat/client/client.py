@@ -16,6 +16,7 @@ from async_chat.utils import (
 from async_chat.utils import get_message_dto_
 from async_chat.client.console import ConsoleServer
 from async_chat.settings import DEFAULT_ROOM
+from async_chat.client.client_verifier import ClientVerifier
 
 
 logger = logging.getLogger('client-logger')
@@ -32,7 +33,7 @@ class Timer:
         return False
 
 
-class ClientChat:
+class ClientChat(metaclass=ClientVerifier):
     def __init__(
             self,
             account_name: str | None,
