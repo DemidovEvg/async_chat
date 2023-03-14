@@ -10,6 +10,7 @@ from async_chat.utils import Request, Response
 from async_chat.server.clients import Client, Clients
 from async_chat.server.response_handler import ResponseHandler
 from async_chat import jim
+from async_chat.server.server_verifier import ServerVerifier
 
 logger = logging.getLogger('server-logger')
 
@@ -21,7 +22,52 @@ class Sokets:
     for_error: list[socket.socket] = field(default_factory=list)
 
 
-class ServerChat:
+class PortDescriptor:
+    def __set_name__(self, owner, name):
+        self.public_name = 'port_' + name
+
+    def __init__(
+        self,
+        default: int | None = None,
+        minvalue: int | None = None,
+        maxvalue: int | None = None
+    ):
+        self.default = default
+        self.minvalue = minvalue
+        self.maxvalue = maxvalue
+
+    def __get__(self, owner, objtype=None):
+        return getattr(owner, self.public_name)
+
+    def __set__(self, owner, value=None):
+        if not value and self.default is None:
+            raise TypeError(
+                f'{self.public_name} is None and set no default value'
+            )
+        if not value and self.default is not None:
+            value = self.default
+
+        if self.minvalue is not None and value < self.minvalue:
+            raise ValueError(f'port num cannot be less than {self.minvalue}')
+        if self.maxvalue is not None and value > self.maxvalue:
+            raise ValueError(f'port num cannot be bigger than {self.maxvalue}')
+
+        setattr(owner, self.public_name, value)
+
+
+class ServerSocket(socket.socket):
+    port = PortDescriptor(default=7777, minvalue=0)
+
+    def bind(self, addr: tuple[str, int] | tuple[str]) -> None:
+        self.ip = addr[0]
+        self.port = addr[1] if len(addr) == 2 else None
+        newaddr = (self.ip, self.port)
+        print(newaddr)
+        super().bind(newaddr)
+
+
+class ServerChat(metaclass=ServerVerifier):
+
     def __init__(
         self, port: int,
         max_users: int,
@@ -50,11 +96,11 @@ class ServerChat:
         sys.exit(0)
 
     def init_socket(self) -> None:
-        self.chat_socket = socket.socket(
+        self.chat_socket = ServerSocket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM
         )
-        self.chat_socket.bind(('localhost', self.port))
+        self.chat_socket.bind(('localhost', ))
         self.chat_socket.listen(self.max_users)
         self.chat_socket.settimeout(self.accept_timeout)
 
