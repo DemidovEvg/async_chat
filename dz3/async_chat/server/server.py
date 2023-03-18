@@ -3,11 +3,12 @@ import signal
 import sys
 import logging
 import select
-# import time
 import datetime as dt
 from dataclasses import dataclass, field
 from async_chat.utils import Request, Response
 from async_chat.server.clients import Client, Clients
+from async_chat.server.db import SessionLocal
+from async_chat.server.user_service import UserService
 from async_chat.server.response_handler import ResponseHandler
 from async_chat import jim
 from async_chat.server.server_verifier import ServerVerifier
@@ -131,6 +132,13 @@ class ServerChat(metaclass=ServerVerifier):
             sock.recv(message_size).decode()
         )
         logger.debug('get_request: %s', request)
+        with SessionLocal() as session:
+            client = self.clients.get_client_by_socket(sock)
+            user_service = UserService(session=session)
+            user_service.user_send_message_to_server(
+                user=client.user_id,
+                adress=client.socket.getsockname()[0]
+            )
         return request
 
     def get_requests(self, sockets: Sokets) -> dict[socket.socket, Request]:
@@ -156,6 +164,11 @@ class ServerChat(metaclass=ServerVerifier):
         return f'{head_message}{data}'.encode()
 
     def send_response(self, client: Client, response: Response) -> None:
+        with SessionLocal() as session:
+            UserService(session).user_get_message_from_server(
+                user=client.user_id,
+                adress=client.socket.getsockname()[0]
+            )
         try:
             logger.debug(
                 'send_response %s %s response=%s',

@@ -2,7 +2,8 @@ import json
 from typing import Any, Type
 import logging
 from async_chat import jim
-from async_chat.server.db import UserService, SessionLocal, User
+from async_chat.server.db import SessionLocal, User
+from async_chat.server.user_service import UserService
 from async_chat.server.clients import Client, Clients
 from async_chat.utils import Request, Response, MessageDto, get_message_dto_, T
 

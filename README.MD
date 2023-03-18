@@ -1,23 +1,23 @@
 ##Приложение async_chat
-Состоит из сервера и клиента.
+- Состоит из сервера и клиента.
 
 ======================================
 Запуск сервера:
-python .\dz3\server_main.py  
+- python .\dz3\server_main.py  
 
 Опциональные аргументы: 
-@click.option('--port', default=3000, type=int)
-@click.option('--max_users', default=5, type=int)
+- --port
+- --max_users
 
 ======================================
 Запуск клиента:
 python .\dz3\client_main.py --account_name=Ivan --password=ivan123
 
 Опциональные аргументы: 
-@click.option('--account_name', type=str)
-@click.option('--password', type=str)
-@click.option('--ip_address', default='127.0.0.1', type=str)
-@click.option('--port', default=3000, type=int)
+- --account_name
+- --password
+- --ip_address
+- --port
 
 ======================================
 ###Запуск тестов:
@@ -26,33 +26,33 @@ python -m unittest discover
 ======================================
 ###Основные команды клиента:
 Вывести список команд:
-$~~~~~$*help*
+- $~~~~~$*help*
 
 Зайти под конкретным аккаунтом:
-$~~~~~$*login --account_name=Ivan1 --password=ivan123*
+- $~~~~~$*login --account_name=Ivan1 --password=ivan123*
 
 Разлогиниться:
-$~~~~~$*logout*
+- $~~~~~$*logout*
 
 Закрыть клиента:
-$~~~~~$*exit*
+- $~~~~~$*exit*
 
 Написать сообщение в текущую комнату в которой находится пользователь:
-$~~~~~$*message **#** "Сообщение в текущую комнату"*
+- $~~~~~$*message **#** "Сообщение в текущую комнату"*
 
 Написать сообщение в общую комнату:
-$~~~~~$*message **#common** "Сообщение всем пользователям"*
+- $~~~~~$*message **#common** "Сообщение всем пользователям"*
 
 Написать сообщение в произвольную комнату:
-$~~~~~$*message **#room_name** "Сообщение в другую комнату"*
+- $~~~~~$*message **#room_name** "Сообщение в другую комнату"*
 
 Написать сообщение конкретному пользователю:
-$~~~~~$*message **Ivan2** "Привет Иван"*
+- $~~~~~$*message **Ivan2** "Привет Иван"*
 
 Зайти в комнату:
-$~~~~~$*join **gamers***
+- $~~~~~$*join **gamers***
 
 Выйти из комнаты:
-$~~~~~$*leave*
+- $~~~~~$*leave*
 
-Для тестов создается юзеры от Ivan1 до Ivan10000 с паролями ivan123
+Для тестов создается юзеры от Ivan1 до Ivan100 с паролями ivan123
