@@ -1,5 +1,5 @@
 from enum import Enum
-from .common_schemas import ActionTimeBase, TimeBase
+from .common_schemas import ActionTimeBase, TimeBase, UserBase
 from pydantic import Field
 
 
@@ -36,3 +36,7 @@ class MessageError(RequestResponseBase):
 
 class MessageProbe(ActionTimeBase):
     action: str = Field(ServerActions.probe.value, const=True)
+
+
+class MessageContacts(MessageAlert):
+    alert: list[UserBase]

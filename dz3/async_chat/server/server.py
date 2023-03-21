@@ -4,10 +4,12 @@ import sys
 import logging
 import select
 import datetime as dt
+import trio
+import sqlalchemy as sa
 from dataclasses import dataclass, field
 from async_chat.utils import Request, Response
 from async_chat.server.clients import Client, Clients
-from async_chat.server.db import SessionLocal
+from async_chat.server.db import SessionLocal, User
 from async_chat.server.user_service import UserService
 from async_chat.server.response_handler import ResponseHandler
 from async_chat import jim
@@ -57,7 +59,7 @@ class PortDescriptor:
 
 
 class ServerSocket(socket.socket):
-    port = PortDescriptor(default=7777, minvalue=0)
+    port = PortDescriptor(default=3000, minvalue=0)
 
     def bind(self, addr: tuple[str, int] | tuple[str]) -> None:
         self.ip = addr[0]
@@ -87,8 +89,20 @@ class ServerChat(metaclass=ServerVerifier):
         self.clients = Clients()
         self.sockets = Sokets()
         self.message_head_size = 4
+        self.throttle = 1
+        self.period_probe = dt.timedelta(seconds=20)
+        self.socket_connected = False
         signal.signal(signal.SIGTERM, self.close_server)
         signal.signal(signal.SIGINT, self.close_server)
+
+    @property
+    def database_connected(self):
+        try:
+            with SessionLocal() as session:
+                session.scalars(sa.select(User)).all()
+        except Exception:
+            return False
+        return True
 
     def close_server(self, signum, frame):
         signame = signal.Signals(signum).name
@@ -101,9 +115,10 @@ class ServerChat(metaclass=ServerVerifier):
             family=socket.AF_INET,
             type=socket.SOCK_STREAM
         )
-        self.chat_socket.bind(('localhost', ))
+        self.chat_socket.bind(('localhost', self.port))
         self.chat_socket.listen(self.max_users)
         self.chat_socket.settimeout(self.accept_timeout)
+        self.socket_connected = True
 
     @classmethod
     def get_sockets(cls, clients: Clients, timeout: float) -> None | Sokets:
@@ -215,7 +230,7 @@ class ServerChat(metaclass=ServerVerifier):
                 )
             if (client.user_id
                 and not message
-                    and client.time + dt.timedelta(seconds=20) < dt.datetime.now()):
+                    and client.time + self.period_probe < dt.datetime.now()):
                 client.time = dt.datetime.now()
                 message = jim.MessageProbe().json()
 
@@ -230,11 +245,12 @@ class ServerChat(metaclass=ServerVerifier):
 
             self.send_message(client, message)
 
-    def run(self) -> None:
+    async def run(self) -> None:
         logger.debug('Старт цикла')
         while True:
             try:
                 sock, addr = self.chat_socket.accept()
+                # Сервер запущен
                 logger.debug('Получен сокет %s', sock)
             except OSError:
                 ...
@@ -247,7 +263,7 @@ class ServerChat(metaclass=ServerVerifier):
                     clients=self.clients,
                     timeout=self.select_timeout
                 )
-
+            await trio.sleep(self.throttle)
             print(len(self.clients))
 
             if not sockets:

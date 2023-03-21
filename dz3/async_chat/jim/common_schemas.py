@@ -19,3 +19,7 @@ class TimeBase(BaseModel):
 
 class ActionTimeBase(TimeBase):
     action: str = Field(min_length=0, max_length=15)
+
+
+class UserBase(BaseModel):
+    account_name: str = Field(min_length=3, max_length=25)

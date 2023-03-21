@@ -6,6 +6,9 @@ from .client_schemas import (
     MessageSendMessage,
     MessageUserJoinRoom,
     MessageUserLeaveRoom,
+    MessageGetContacts,
+    MessageAddContact,
+    MessageDeleteContact,
     ClientActions,
     Statuses
 )
@@ -13,6 +16,8 @@ from .server_schemas import (
     MessageAlert,
     MessageError,
     MessageProbe,
+    MessageContacts,
+    ServerActions,
     StatusCodes
 )
 from .data_validator import DataValidator
@@ -25,11 +30,16 @@ __all__ = [
     'MessageSendMessage',
     'MessageUserJoinRoom',
     'MessageUserLeaveRoom',
+    'MessageGetContacts',
+    'MessageAddContact',
+    'MessageDeleteContact',
     'ClientActions',
     'Statuses',
     'MessageAlert',
     'MessageError',
     'MessageProbe',
+    'MessageContacts',
+    'ServerActions',
     'StatusCodes',
-    'DataValidator'
+    'DataValidator',
 ]

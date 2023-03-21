@@ -69,12 +69,14 @@ class ClientChat(metaclass=ClientVerifier):
         self._chat_socket = socket.create_connection(
             (str(self.ip_address), self.port))
         self._chat_socket.settimeout(1.0)
-        # self._chat_socket.setblocking(0)
 
-    def reconnect_to_server(self) -> None:
-        self._chat_socket = socket.create_connection(
-            (str(self.ip_address), self.port)
-        )
+    def connect_to_server_loop(self) -> None:
+        while True:
+            try:
+                self.connect_to_server()
+                break
+            except ConnectionRefusedError:
+                logger.info('Неудачное подключение к серверу')
 
     def get_message_size(self, head: str) -> int:
         return int(head, 16)
@@ -86,9 +88,9 @@ class ClientChat(metaclass=ClientVerifier):
             message_head = (
                 self._chat_socket.recv(self.message_head_size)
             )
-            print(message_head)
+            print(f'{message_head=}')
             if len(message_head) == 0:
-                return
+                raise ConnectionResetError()
             message_size = self.get_message_size(message_head)
             incomming_message = (
                 self._chat_socket.recv(message_size).decode()
@@ -97,10 +99,12 @@ class ClientChat(metaclass=ClientVerifier):
             # logger.debug('BlockingIOError')
             return
         except TimeoutError:
+            # logger.debug('TimeoutError')
             return
         except ConnectionResetError:
-            logger.debug('Сокет закрыт')
-            self.reconnect_to_server()
+            logger.debug('Сокет закрыт, пробуем переподлючиться')
+            self.connect_to_server_loop()
+            return
         logger.debug('get_incomming_message: %s', incomming_message)
         return incomming_message
 
@@ -133,9 +137,9 @@ class ClientChat(metaclass=ClientVerifier):
                 logger.debug(
                     f'Action not exist={incomming_data} '
                 )
-            elif action == 'probe':
+            elif action == jim.ServerActions.probe.value:
                 self.action_send_presence()
-            elif action == 'msg':
+            elif action == jim.ClientActions.msg.value:
                 self.print_message(incomming_data)
             else:
                 logger.error(
@@ -208,12 +212,7 @@ class ClientChat(metaclass=ClientVerifier):
         asyncio.run(self.main_loop())
 
     async def main_loop(self):
-        while True:
-            try:
-                self.connect_to_server()
-                break
-            except ConnectionRefusedError:
-                logger.info('Неудачное подключение к серверу')
+        self.connect_to_server_loop()
 
         task_command = asyncio.create_task(self.console.get_command())
         while True:
@@ -264,6 +263,14 @@ class ClientChat(metaclass=ClientVerifier):
                 _, target, *message_words = command.split()
                 message = ' '.join(message_words)
                 self.action_send_message(target, message)
+            elif 'contacts' in command:
+                self.action_get_contacts()
+            elif 'add-contact' in command:
+                _, account_name = command.split()
+                self.action_add_contact(account_name=account_name)
+            elif 'del-contact' in command:
+                _, account_name = command.split()
+                self.action_del_contact(account_name=account_name)
             elif 'join' in command:
                 _, room, *_ = command.split()
                 self.action_join(room)
@@ -451,3 +458,22 @@ class ClientChat(metaclass=ClientVerifier):
             logger.debug('Удачно вышли из комнаты')
             self.room = DEFAULT_ROOM
             self.console.set_room(self.room)
+
+    def action_get_contacts(self) -> None:
+        message_model = jim.MessageGetContacts()
+        outgoing_message = str(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
+
+    def action_add_contact(self, account_name: str) -> None:
+        message_model = jim.MessageAddContact(
+            target_user=dict(account_name=account_name)
+        )
+        outgoing_message = str(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)
+
+    def action_del_contact(self, account_name: str) -> None:
+        message_model = jim.MessageDeleteContact(
+            target_user=dict(account_name=account_name)
+        )
+        outgoing_message = str(message_model.json())
+        self.send_outgoing_message(outgoing_message=outgoing_message)

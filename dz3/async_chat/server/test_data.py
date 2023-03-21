@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 
 class TestData:
-    def __init__(self, session: Session, count: int = 100):
+    def __init__(self, session: Session, count: int = 30):
         from async_chat.server import db
         from async_chat.server.user_service import UserService
         self.db = db
@@ -20,7 +20,7 @@ class TestData:
                 self.db.User(account_name=f'Ivan{i}', password='ivan123')
             )
         self.session.add_all(users)
-        self.session.commit()
+        self.session.flush()
         self.users = users
 
     def create_contacts(self):
@@ -31,9 +31,9 @@ class TestData:
                     contact = self.db.Contact(
                         friend_id=friend.id
                     )
-                    user.friends.append(contact)
+                    user.contacts.append(contact)
         self.session.add_all(self.users)
-        self.session.commit()
+        self.session.flush()
 
     def create_history(self):
         for user in self.users:
@@ -67,3 +67,4 @@ class TestData:
         self.create_users()
         self.create_contacts()
         self.create_history()
+        self.session.commit()

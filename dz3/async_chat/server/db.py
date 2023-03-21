@@ -1,6 +1,7 @@
 import datetime as dt
 from typing import Optional
 import enum
+from functools import cached_property
 import sqlalchemy as sa
 from sqlalchemy import create_engine, select, ForeignKey
 from sqlalchemy.orm import (
@@ -34,7 +35,7 @@ class User(Base):
         back_populates='user',
         cascade='all, delete'
     )
-    friends: Mapped[list['Contact']] = relationship(
+    contacts: Mapped[list['Contact']] = relationship(
         back_populates='user',
         foreign_keys='Contact.user_id'
     )
@@ -42,6 +43,20 @@ class User(Base):
         back_populates='user',
         foreign_keys='Contact.friend_id'
     )
+
+    @property
+    def friends(self) -> list['User']:
+        session = Session.object_session(self)
+        subq = select(Contact).where(Contact.user_id == self.id).subquery()
+        stmt = select(User).join(subq, User.id == subq.c.friend_id)
+        select(User).join_from(User, User.contacts).where(Contact.user_id == 1)
+        return session.scalars(stmt).all()
+
+    @cached_property
+    def user_service(self):
+        from async_chat.server.user_service import UserService
+        session = Session.object_session(self)
+        return UserService(session)
 
     def _get_last_event_time(self, event: 'History.Event'):
         session = Session.object_session(self)
@@ -63,11 +78,11 @@ class User(Base):
 
     @property
     def last_send_message(self):
-        return self._get_last_event_time(event=History.Event.send_message)
+        return self._get_last_event_time(event=History.Event.user_send_message_to_server)
 
     @property
     def last_get_message(self):
-        return self._get_last_event_time(event=History.Event.get_message)
+        return self._get_last_event_time(event=History.Event.user_get_message_from_server)
 
     def __repr__(self):
         return (
@@ -77,21 +92,7 @@ class User(Base):
     def is_online(self):
         if not self.has_entered:
             return False
-        last_login = self.last_login.replace(tzinfo=dt.timezone.utc)
-        last_message = self.last_send_message.replace(tzinfo=dt.timezone.utc)
-        if not last_login:
-            return False
-
-        if not last_message:
-            last_time = last_login
-        else:
-            last_time = last_login if last_login > last_message else last_message
-
-        aware_message_time = last_time.replace(tzinfo=dt.timezone.utc)
-        diff = dt.datetime.now(dt.timezone.utc) - aware_message_time
-        if diff < dt.timedelta(seconds=600):
-            return True
-        return False
+        return True
 
     def check_password(self, password: str):
         return self.password == password
@@ -122,7 +123,7 @@ class Contact(Base):
         ForeignKey('user.id')
     )
     user: Mapped[User] = relationship(
-        back_populates='friends',
+        back_populates='contacts',
         foreign_keys=[user_id]
     )
 

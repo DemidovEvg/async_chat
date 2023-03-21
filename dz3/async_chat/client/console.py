@@ -65,7 +65,10 @@ class ConsoleServer:
             'presence',
             'message',
             'join',
-            'leave'
+            'leave',
+            'contacts',
+            'add-contact',
+            'del-contact'
         ]
         right_command = False
         for command in available_commands:
@@ -91,7 +94,7 @@ class ConsoleServer:
     def print_help(self) -> None:
         print('Допустимые команды:')
         print('- help')
-        print('- login --account_name=Ivan51 --password=ivan123')
+        print('- login --account_name=Ivan1 --password=ivan123')
         print('- logout')
         print('- exit')
         print('- presence')
@@ -99,5 +102,8 @@ class ConsoleServer:
         print('- message #common "Сообщение всем пользователям"')
         print('- message #room_name "Сообщение в другую комнату"')
         print('- message Ivan2 "Привет Иван"')
+        print('- contacts')
+        print('- add-contact Ivan2')
+        print('- del-contact Ivan2')
         print('- join gamers')
         print('- leave')

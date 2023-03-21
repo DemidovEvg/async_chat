@@ -1,7 +1,6 @@
-from pydantic import BaseModel
 from enum import Enum
 from pydantic import Field
-from .common_schemas import ActionTimeBase
+from .common_schemas import ActionTimeBase, UserBase
 
 
 class ClientActions(str, Enum):
@@ -11,14 +10,13 @@ class ClientActions(str, Enum):
     authenticate = 'authenticate'
     join_ = 'join'
     leave = 'leave'
+    get_contacts = 'get_contacts'
+    add_contact = 'add_contact'
+    del_contact = 'del_contact'
 
 
 class Statuses(str, Enum):
     i_am_here = 'Yep, I am here!'
-
-
-class UserBase(BaseModel):
-    account_name: str = Field(min_length=3, max_length=25)
 
 
 class UserForAuth(UserBase):
@@ -64,3 +62,17 @@ class MessageUserJoinRoom(ActionTimeBase):
 class MessageUserLeaveRoom(ActionTimeBase):
     action: str = Field(ClientActions.leave.value, const=True)
     user: UserBase
+
+
+class MessageGetContacts(ActionTimeBase):
+    action: str = Field(ClientActions.get_contacts.value, const=True)
+
+
+class MessageAddContact(ActionTimeBase):
+    action: str = Field(ClientActions.add_contact.value, const=True)
+    target_user: UserBase
+
+
+class MessageDeleteContact(ActionTimeBase):
+    action: str = Field(ClientActions.del_contact.value, const=True)
+    target_user: UserBase
