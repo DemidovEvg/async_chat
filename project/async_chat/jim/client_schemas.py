@@ -30,11 +30,13 @@ class UserForPresence(UserBase):
 class MessageUserPresence(ActionTimeBase):
     action: str = Field(ClientActions.presence.value, const=True)
     user: UserForPresence
+    token: str
 
 
 class MessageUserQuit(ActionTimeBase):
     action: str = Field(ClientActions.quit.value, const=True)
     user: UserBase
+    token: str
 
 
 class MessageUserAuth(ActionTimeBase):
@@ -47,32 +49,43 @@ class MessageBaseActionSend(ActionTimeBase):
     from_: str = Field(min_length=3, max_length=25)
     encoding: str | None
     message: str = Field(min_length=0, max_length=500)
+    token: str
 
 
 class MessageSendMessage(MessageBaseActionSend):
     to_: str = Field(min_length=3, max_length=25)
+    user: UserBase
+    token: str
 
 
 class MessageUserJoinRoom(ActionTimeBase):
     action: str = Field(ClientActions.join_.value, const=True)
     room: str = Field(min_length=3, max_length=25)
     user: UserBase
+    token: str
 
 
 class MessageUserLeaveRoom(ActionTimeBase):
     action: str = Field(ClientActions.leave.value, const=True)
     user: UserBase
+    token: str
 
 
 class MessageGetContacts(ActionTimeBase):
     action: str = Field(ClientActions.get_contacts.value, const=True)
+    user: UserBase
+    token: str
 
 
 class MessageAddContact(ActionTimeBase):
     action: str = Field(ClientActions.add_contact.value, const=True)
     target_user: UserBase
+    user: UserBase
+    token: str
 
 
 class MessageDeleteContact(ActionTimeBase):
     action: str = Field(ClientActions.del_contact.value, const=True)
     target_user: UserBase
+    user: UserBase
+    token: str

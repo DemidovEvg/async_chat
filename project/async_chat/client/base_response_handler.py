@@ -21,7 +21,7 @@ class BaseResponseHandler(ABC):
     ):
         success = (
             True
-            if isinstance(response_model, jim.MessageAlert)
+            if not isinstance(response_model, jim.MessageError)
             else False
         )
         return success
@@ -30,7 +30,7 @@ class BaseResponseHandler(ABC):
     def result_login(
         self,
         request_model: jim.MessageUserAuth,
-        response_model: jim.MessageAlert | jim.MessageError,
+        response_model: jim.MessageToken | jim.MessageError,
     ):
         pass
 
@@ -114,9 +114,7 @@ class BaseResponseHandler(ABC):
 
     def dispatch_result_dict(self, result_dict: dict[str, Any]):
         request_model = result_dict['request_model']
-        if request_model and isinstance(request_model, jim.MessageUserAuth):
-            self.result_login(**result_dict)
-        elif request_model and isinstance(request_model, jim.MessageUserQuit):
+        if request_model and isinstance(request_model, jim.MessageUserQuit):
             self.result_logout(**result_dict)
         elif request_model and isinstance(request_model, jim.MessageGetContacts):
             self.result_get_contacts(**result_dict)
@@ -160,6 +158,11 @@ class BaseResponseHandler(ABC):
             or isinstance(response_model, jim.MessageContacts)
         ):
             return self.processing_incomming_alert_or_error(
+                request_model=request_model,
+                response_model=response_model
+            )
+        elif isinstance(response_model, jim.MessageToken):
+            return self.result_login(
                 request_model=request_model,
                 response_model=response_model
             )

@@ -1,11 +1,14 @@
 import json
-from typing import Any, Type
 import logging
-from async_chat import jim
+from typing import Any, Type
+import datetime as dt
+from async_chat.server.clients import Client, Clients
 from async_chat.server.db import SessionLocal, User
 from async_chat.server.user_service import UserService
-from async_chat.server.clients import Client, Clients
-from async_chat.utils import Request, Response, MessageDto, get_message_dto_, T
+from async_chat.server.utils_auth import append_current_user, login_required, create_access_token
+from async_chat.utils import MessageDto, Request, Response, T, get_message_dto_
+
+from async_chat import jim
 
 logger = logging.getLogger('server-logger')
 
@@ -135,55 +138,75 @@ class ResponseHandler:
             self.put_message_for_current_client(message_error)
             return
 
-    def processing_login_user(self, data: dict[str, Any]) -> Response:
+    def return_error(
+        self,
+        chain_id: int | str,
+        response: jim.StatusCodes,
+        error_text: str
+    ) -> None:
+        error_message = jim.MessageError(
+            chain_id=chain_id,
+            response=response,
+            error=error_text
+        ).json()
+        logger.error(error_text)
+        self.put_message_for_current_client(error_message)
+        return
+
+    @append_current_user
+    def processing_login_user(self, data: dict[str, Any], current_user: User | None) -> Response:
         message_model: jim.MessageUserAuth = self.get_message_model(
             schema=jim.MessageUserAuth,
             data=data
         )
         with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                message_model.user.account_name
-            )
-            if (not current_user
-                    or not current_user.check_password(message_model.user.password)):
-                error_message = jim.MessageError(
+            if not current_user:
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN,
-                    error="Bad password or login"
-                ).json()
-                logger.error(
-                    f'Bad password or login for data={data} '
+                    error_text="Bad password or login"
                 )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
+            plain_passord = message_model.user.password
+            hashed_password = current_user.password
+            if not current_user.__class__.verify_password(
+                plain_passord,
+                    hashed_password):
+                return self.return_error(
+                    chain_id=message_model.id,
+                    response=jim.StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN,
+                    error_text="Bad password or login"
+                )
             if current_user.is_online() and self.current_client.user_id == current_user.id:
-                error_message = jim.MessageError(
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are already login"
-                ).json()
-                logger.error(
-                    f'User already login for data={data} '
+                    error_text="You are already login"
                 )
-                self.put_message_for_current_client(error_message)
-                return
             if current_user.is_online() and not self.current_client.user_id:
                 self.clients.remove_another_client_with_user(current_user.id)
+            user_service = UserService(session=session)
             user_service.login(current_user, message_model.time)
             self.current_client.user_id = current_user.id
             logger.debug(
                 'login_user: %s current_user=%s', message_model, current_user
             )
             session.commit()
-        ok_message = jim.MessageAlert(
-            chain_id=message_model.id,
-            response=jim.StatusCodes.HTTP_200_OK,
-            alert='OK'
-        ).json()
-        self.put_message_for_current_client(ok_message)
+            user_model = jim.UserBase(account_name=current_user.account_name)
+            token = create_access_token(
+                data=user_model.dict(),
+                expires_delta=dt.timedelta(days=1)
+            )
+            token_message = jim.MessageToken(
+                chain_id=message_model.id,
+                response=jim.StatusCodes.HTTP_201_CREATED,
+                token=token
+            ).json()
+            self.put_message_for_current_client(token_message)
 
-    def processing_logout_user(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_logout_user(self, data: dict[str, Any], current_user: User | None) -> Response:
         message_model: jim.MessageUserQuit = self.get_message_model(
             schema=jim.MessageUserQuit,
             data=data
@@ -211,40 +234,15 @@ class ResponseHandler:
                 )
                 session.commit()
 
-    def processing_presence(self, data: dict[str, Any]) -> None:
+    @append_current_user
+    @login_required
+    def processing_presence(self, data: dict[str, Any], current_user: User) -> None:
         message_model: jim.MessageUserPresence = self.get_message_model(
             schema=jim.MessageUserPresence,
             data=data
         )
         with SessionLocal() as session:
             user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                account_name=message_model.user.account_name
-            )
-            if not current_user:
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_404_NOT_FOUND,
-                    error='User not found'
-                ).json()
-                logger.error(
-                    f'User not found for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
-
-            if not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_401_UNAUTHORIZED,
-                    error='Auth required'
-                ).json()
-                logger.error(
-                    f'Auth required for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
-
             user_service.presence(
                 user=current_user,
                 time=message_model.time
@@ -263,7 +261,9 @@ class ResponseHandler:
         self.put_message_for_current_client(message)
         return
 
-    def processing_message(self, data: dict[str, Any]) -> None:
+    @append_current_user
+    @login_required
+    def processing_message(self, data: dict[str, Any], current_user: User) -> None:
         message_model: jim.MessageSendMessage = self.get_message_model(
             schema=jim.MessageSendMessage,
             data=data
@@ -271,32 +271,7 @@ class ResponseHandler:
 
         with SessionLocal() as session:
             user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                account_name=message_model.from_
-            )
-            if not current_user:
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_404_NOT_FOUND,
-                    error='From user not found'
-                ).json()
-                logger.error(
-                    f'From user not found for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
-
-            if not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_401_UNAUTHORIZED,
-                    error='Auth required'
-                ).json()
-                logger.error(
-                    f'Auth required for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
 
             user_service.presence(
                 user=current_user,
@@ -328,28 +303,18 @@ class ResponseHandler:
             )
 
             if not target_user:
-                error_message = jim.MessageError(
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_404_NOT_FOUND,
-                    error='Target user not found'
-                ).json()
-                logger.error(
-                    f'Target user not found for data={data} '
+                    error_text=f"Target user {message_model.to_} not found"
                 )
-                self.put_message_for_current_client(error_message)
-                return
 
             if not target_user.is_online():
-                error_message = jim.MessageError(
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_401_UNAUTHORIZED,
-                    error='Target user offline'
-                ).json()
-                logger.error(
-                    f'Target user offline for data={data} '
+                    error_text=f"Target user {message_model.to_} offline"
                 )
-                self.put_message_for_current_client(error_message)
-                return
 
             logger.debug(
                 'processing_presence: %s current_user=%s',
@@ -360,29 +325,16 @@ class ResponseHandler:
             session.commit()
         self.put_message_for_current_client(message_accepted)
 
-    def processing_join_room(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_join_room(self, data: dict[str, Any], current_user: User) -> Response:
         message_model: jim.MessageUserJoinRoom = self.get_message_model(
             schema=jim.MessageUserJoinRoom,
             data=data
         )
 
         with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                message_model.user.account_name
-            )
-
-            if not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are not login"
-                ).json()
-                logger.error(
-                    f'User not login for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
 
             self.clients.join_to_room(self.current_client, message_model.room)
 
@@ -397,29 +349,16 @@ class ResponseHandler:
         ).json()
         self.put_message_for_current_client(ok_message)
 
-    def processing_leave_room(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_leave_room(self, data: dict[str, Any], current_user: User) -> Response:
         message_model: jim.MessageUserLeaveRoom = self.get_message_model(
             schema=jim.MessageUserLeaveRoom,
             data=data
         )
 
         with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_account_name(
-                message_model.user.account_name
-            )
-
-            if not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are not login"
-                ).json()
-                logger.error(
-                    f'User not login for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
 
             self.clients._leave_current_room(self.current_client.user_id)
             room = self.clients.get_room_name(self.current_client)
@@ -435,34 +374,20 @@ class ResponseHandler:
         ).json()
         self.put_message_for_current_client(ok_message)
 
-    def processing_get_contacts(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_get_contacts(self, data: dict[str, Any], current_user: User) -> Response:
         message_model: jim.MessageGetContacts = self.get_message_model(
             schema=jim.MessageGetContacts,
             data=data
         )
 
         with SessionLocal() as session:
-            user_service = UserService(session=session)
-            current_user = user_service.get_user_by_id(
-                id=self.current_client.user_id
-            )
-            if not current_user or not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are not login"
-                ).json()
-                logger.error(
-                    f'User not login for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
-
+            session.add(current_user)
             friends = [
                 dict(account_name=u.account_name)
                 for u in current_user.friends
             ]
-
             logger.debug(
                 'current_user=%s get contancts', current_user
             )
@@ -473,7 +398,9 @@ class ResponseHandler:
         ).json()
         self.put_message_for_current_client(contacts_message)
 
-    def processing_add_contact(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_add_contact(self, data: dict[str, Any], current_user: User) -> Response:
         message_model: jim.MessageAddContact = self.get_message_model(
             schema=jim.MessageAddContact,
             data=data
@@ -481,34 +408,17 @@ class ResponseHandler:
 
         with SessionLocal() as session:
             user_service = UserService(session=session)
-            current_user = user_service.get_user_by_id(
-                id=self.current_client.user_id
-            )
-            if not current_user or not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are not login"
-                ).json()
-                logger.error(
-                    f'User not login for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
+
             target_user = user_service.get_user_by_account_name(
                 account_name=message_model.target_user.account_name
             )
             if not target_user:
-                error_message = jim.MessageError(
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                    error="Target user not exist"
-                ).json()
-                logger.error(
-                    f'Target user not exist for data={data} '
+                    error_text=f"Target user {message_model.target_user.account_name} not exist"
                 )
-                self.put_message_for_current_client(error_message)
-                return
 
             user_service.add_contact_for_user(
                 current_user=current_user,
@@ -525,42 +435,25 @@ class ResponseHandler:
         ).json()
         self.put_message_for_current_client(ok_message)
 
-    def processing_delete_contact(self, data: dict[str, Any]) -> Response:
+    @append_current_user
+    @login_required
+    def processing_delete_contact(self, data: dict[str, Any], current_user: User) -> Response:
         message_model: jim.MessageDeleteContact = self.get_message_model(
             schema=jim.MessageDeleteContact,
             data=data
         )
-
         with SessionLocal() as session:
             user_service = UserService(session=session)
-            current_user = user_service.get_user_by_id(
-                id=self.current_client.user_id
-            )
-            if not current_user or not current_user.is_online():
-                error_message = jim.MessageError(
-                    chain_id=message_model.id,
-                    response=jim.StatusCodes.HTTP_409_CONFLICT,
-                    error="You are not login"
-                ).json()
-                logger.error(
-                    f'User not login for data={data} '
-                )
-                self.put_message_for_current_client(error_message)
-                return
+            session.add(current_user)
             target_user = user_service.get_user_by_account_name(
                 account_name=message_model.target_user.account_name
             )
             if not target_user:
-                error_message = jim.MessageError(
+                return self.return_error(
                     chain_id=message_model.id,
                     response=jim.StatusCodes.HTTP_400_BAD_REQUEST,
-                    error="Target user not exist"
-                ).json()
-                logger.error(
-                    f'Target user not exist for data={data} '
+                    error_text=f"Target user {message_model.target_user.account_name} not exist"
                 )
-                self.put_message_for_current_client(error_message)
-                return
 
             user_service.delete_contact_for_user(
                 current_user=current_user,

@@ -111,7 +111,8 @@ class MainWindowContol(BaseUI):
         self.sendMessageButton.setEnabled(enabled)
         self.leaveRoomButton.setEnabled(enabled)
 
-    def result_login(self, success: bool) -> None:
+    def result_login(self, success: bool, error: str = '') -> None:
+        self.current_user.try_login = False
         self.login_status(success=success)
         if success:
             self._get_contacts.start(10000)
@@ -130,6 +131,7 @@ class MainWindowContol(BaseUI):
             self.clean_contacts()
             self.rerender_contacts()
             self.set_enable_control_buttons(False)
+            self.show_error(error)
 
     def get_selected_contact(self):
         item = self.contactsList.currentItem()
@@ -193,6 +195,7 @@ class MainWindowContol(BaseUI):
 
     @Slot()
     def action_login(self) -> None:
+        self.current_user.try_login = True
         account_name = self.loginLine.text()
         password = self.passwordLine.text()
         command = f'login --account_name={account_name} --password={password}'
@@ -266,9 +269,18 @@ class MainWindowContol(BaseUI):
 
     def client_ui_step(self):
         if self.client_ui_talk.get_connected():
+            if not self.current_user.try_login and not current_user.is_entered:
+                self.loginButton.setEnabled(True)
             self.set_status(self.onlineStatus, 'online', 'green')
         else:
+            self.loginButton.setEnabled(False)
+            self.connectButton.setEnabled(True)
             self.set_status(self.onlineStatus, 'offline', 'red')
+
+        if self.current_user.is_entered:
+            self.set_status(self.loginStatus, 'login success', 'green')
+        else:
+            self.set_status(self.loginStatus, 'no login', 'red')
 
         self.outgoing_messages_processing()
         self.incomming_messages_processing()
@@ -363,8 +375,6 @@ class MainWindowContol(BaseUI):
             self.portLine.setStyleSheet(self.__class__.grey)
             self.connectButton.setEnabled(False)
 
-            self.loginButton.setEnabled(True)
-
             self._timer = QTimer()
             self._timer.timeout.connect(self.client_ui_step)
             self._timer.start(200)
@@ -374,16 +384,17 @@ class MainWindowContol(BaseUI):
             self.show_error(exc.__repr__())
 
     def show_error(self, error: str):
-        self.widget = QtWidgets.QDialog()
-        self.widget.setStyleSheet("background-color: pink;")
-        layout = QtWidgets.QVBoxLayout()
-        error_text = QtWidgets.QTextBrowser()
-        error_text.setText(error)
-        error_text.setStyleSheet("font-size: 12pt;")
-        layout.addWidget(error_text)
-        self.widget.setLayout(layout)
+        if error:
+            self.widget = QtWidgets.QDialog()
+            self.widget.setStyleSheet("background-color: pink;")
+            layout = QtWidgets.QVBoxLayout()
+            error_text = QtWidgets.QTextBrowser()
+            error_text.setText(error)
+            error_text.setStyleSheet("font-size: 12pt")
+            layout.addWidget(error_text)
+            self.widget.setLayout(layout)
 
-        self.widget.show()
+            self.widget.show()
 
     def show(self):
         self.parent.show()

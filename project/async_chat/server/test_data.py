@@ -16,9 +16,10 @@ class TestData:
     def create_users(self):
         users: list[self.db.User] = []
         for i in range(self.count):
-            users.append(
-                self.db.User(account_name=f'Ivan{i}', password='ivan123')
-            )
+            new_user = self.db.User(account_name=f'Ivan{i}')
+            new_user.password = new_user.get_password_hash('ivan123')
+            users.append(new_user)
+
         self.session.add_all(users)
         self.session.flush()
         self.users = users

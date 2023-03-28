@@ -22,7 +22,10 @@ class ClientUIResponseHandler(BaseResponseHandler):
         response_model: jim.MessageAlert | jim.MessageError,
     ):
         success = self.is_success(response_model)
-        self.ui.result_login(success=success)
+        error = ''
+        if isinstance(response_model, jim.MessageError):
+            error = response_model.error
+        self.ui.result_login(success=success, error=error)
 
     def result_logout(
         self,

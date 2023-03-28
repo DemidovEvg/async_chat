@@ -12,10 +12,11 @@ class ClientResponseHandler(BaseResponseHandler):
     def result_login(
         self,
         request_model: jim.MessageUserAuth,
-        response_model: jim.MessageAlert | jim.MessageError,
+        response_model: jim.MessageToken | jim.MessageError,
     ):
         success = self.is_success(response_model)
         self.current_user.is_entered = success
+        self.current_user.token = response_model.token
         if success:
             logger.debug('Вход удачный')
         else:
@@ -134,7 +135,8 @@ class ClientResponseHandler(BaseResponseHandler):
         request_model: jim.MessageProbe,
     ) -> jim.MessageUserPresence:
         message_model = jim.MessageUserPresence(
-            user=dict(account_name=self.current_user.account_name)
+            user=dict(account_name=self.current_user.account_name),
+            token=self.current_user.token
         )
         return message_model
 
@@ -256,24 +258,21 @@ class ClientResponseHandler(BaseResponseHandler):
         return message_model
 
     async def action_logout(self, account_name: str) -> jim.MessageUserQuit:
-        message_model = jim.MessageUserQuit(
-            user=dict(
-                account_name=account_name,
-            )
-        )
         message_dto = get_message_dto_(
             schema=jim.MessageUserQuit,
             data=dict(
                 user=dict(
                     account_name=account_name,
-                ))
+                ),
+                token=self.current_user.token
+            )
         )
         if message_dto.error_message:
             raise WrongCommand(message_dto.error_message)
 
         if not message_dto.message_model:
             raise WrongCommand('Could not get message_model for message')
-        return message_model
+        return message_dto.message_model
 
     async def action_send_message(self, target: str, message: str) -> jim.MessageSendMessage:
         if not self.current_user.account_name:
@@ -284,7 +283,11 @@ class ClientResponseHandler(BaseResponseHandler):
             message_model = jim.MessageSendMessage(
                 from_=self.current_user.account_name,
                 to_=target,
-                message=message
+                message=message,
+                user=dict(
+                    account_name=self.current_user.account_name,
+                ),
+                token=self.current_user.token
             )
         except ValidationError as exc:
             raise WrongCommand(str(exc))
@@ -298,7 +301,8 @@ class ClientResponseHandler(BaseResponseHandler):
                 room=room,
                 user=dict(
                     account_name=self.current_user.account_name,
-                )
+                ),
+                token=self.current_user.token
             )
         except ValidationError as exc:
             raise WrongCommand(str(exc))
@@ -308,22 +312,36 @@ class ClientResponseHandler(BaseResponseHandler):
         message_model = jim.MessageUserLeaveRoom(
             user=dict(
                 account_name=self.current_user.account_name,
-            )
+            ),
+            token=self.current_user.token
         )
         return message_model
 
     async def action_get_contacts(self) -> jim.MessageGetContacts:
-        message_model = jim.MessageGetContacts()
+        message_model = jim.MessageGetContacts(
+            user=dict(
+                account_name=self.current_user.account_name,
+            ),
+            token=self.current_user.token
+        )
         return message_model
 
     async def action_add_contact(self, account_name: str) -> jim.MessageAddContact:
         message_model = jim.MessageAddContact(
-            target_user=dict(account_name=account_name)
+            target_user=dict(account_name=account_name),
+            user=dict(
+                account_name=self.current_user.account_name,
+            ),
+            token=self.current_user.token
         )
         return message_model
 
     async def action_del_contact(self, account_name: str) -> jim.MessageDeleteContact:
         message_model = jim.MessageDeleteContact(
-            target_user=dict(account_name=account_name)
+            target_user=dict(account_name=account_name),
+            user=dict(
+                account_name=self.current_user.account_name,
+            ),
+            token=self.current_user.token
         )
         return message_model

@@ -14,6 +14,7 @@ from async_chat.server.user_service import UserService
 from async_chat.server.response_handler import ResponseHandler
 from async_chat import jim
 from async_chat.server.server_verifier import ServerVerifier
+from async_chat.utils import decrypt, load_keys
 
 logger = logging.getLogger('server-logger')
 
@@ -92,6 +93,8 @@ class ServerChat(metaclass=ServerVerifier):
         self.throttle = 0.01
         self.period_probe = dt.timedelta(seconds=20)
         self.socket_connected = False
+        private_key, _ = load_keys()
+        self.private_key = private_key
         signal.signal(signal.SIGTERM, self.close_server)
         signal.signal(signal.SIGINT, self.close_server)
 
@@ -143,8 +146,17 @@ class ServerChat(metaclass=ServerVerifier):
         if len(message_head) == 0:
             return
         message_size = self.get_message_size(message_head)
+        chunks = []
+        bytes_recd = 0
+        while bytes_recd < message_size:
+            chunk = sock.recv(min(message_size - bytes_recd, 2048))
+            if chunk == b'':
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            bytes_recd = bytes_recd + len(chunk)
+        data_bytes = b''.join(chunks)
         request = Request(
-            sock.recv(message_size).decode()
+            decrypt(data_bytes, self.private_key)
         )
         logger.debug('get_request: %s', request)
         with SessionLocal() as session:

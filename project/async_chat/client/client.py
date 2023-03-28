@@ -18,6 +18,8 @@ from async_chat.client.client_verifier import ClientVerifier
 from async_chat.client.client_ui.client_ui_talk import ClientUiTalk
 from async_chat.client.client_response_handler import ClientResponseHandler
 from async_chat.client.message_chain import messages_chain
+from async_chat.utils import encrypt, load_keys
+
 
 logger = logging.getLogger('client-logger')
 
@@ -58,6 +60,8 @@ class ClientChat(metaclass=ClientVerifier):
         signal.signal(signal.SIGTERM, self.close_client)
         signal.signal(signal.SIGINT, self.close_client)
         self.counter = 0
+        _, publick_key = load_keys()
+        self.publick_key = publick_key
 
     def close_client(self, signum, frame):
         signame = signal.Signals(signum).name
@@ -71,10 +75,12 @@ class ClientChat(metaclass=ClientVerifier):
             type=socket.SOCK_STREAM
         )
         self._chat_socket = socket.create_connection(
-            (str(self.ip_address), self.port))
+            address=(str(self.ip_address), self.port),
+            timeout=0.01
+        )
         self._chat_socket.settimeout(0.01)
 
-    def connect_to_server_loop(self) -> None:
+    async def connect_to_server_loop(self) -> None:
         while True:
             try:
                 self.connect_to_server()
@@ -91,11 +97,12 @@ class ClientChat(metaclass=ClientVerifier):
                 logger.error(
                     f'Неудачное подключение к серверу {exc.__repr__()}'
                 )
+            await trio.sleep(0.1)
 
     def get_message_size(self, head: str) -> int:
         return int(head, 16)
 
-    def get_incomming_message(self) -> str | None:
+    async def get_incomming_message(self) -> str | None:
         self.counter = self.counter + 1
         # print(f'{self.counter}---{self.account_name}---get_incomming_message')
         try:
@@ -117,7 +124,7 @@ class ClientChat(metaclass=ClientVerifier):
             return
         except ConnectionResetError:
             logger.debug('Сокет закрыт, пробуем переподлючиться')
-            self.connect_to_server_loop()
+            await self.connect_to_server_loop()
             return
         logger.debug('get_incomming_message: %s', incomming_message)
         return incomming_message
@@ -151,20 +158,21 @@ class ClientChat(metaclass=ClientVerifier):
                 dict(error=exc.__repr__())
             )
 
-    def form_data(self, data: str) -> bytes:
-        length = len(data.encode())
+    def form_data(self, data: bytes) -> bytes:
+        length = len(data)
         hex_legth = hex(length)[2:]
         head_message = f'00{hex_legth}'[-4:]
-        return f'{head_message}{data}'.encode()
+        return head_message.encode() + data
 
-    def send_outgoing_message(self, outgoing_message: str) -> None:
+    async def send_outgoing_message(self, outgoing_message: str) -> None:
         try:
-            data = self.form_data(outgoing_message)
-            logger.debug('send_outgoing_message: %s', data.decode())
+            logger.debug('send_outgoing_message: %s', outgoing_message)
+            encrypted_data = encrypt(outgoing_message, self.publick_key)
+            data = self.form_data(encrypted_data)
             self._chat_socket.send(data)
         except OSError as exc:
             logger.error('OSError= %s', str(exc))
-            self.connect_to_server_loop()
+            await self.connect_to_server_loop()
 
     def close_socket(self) -> None:
         if hasattr(self, '_chat_socket'):
@@ -174,7 +182,7 @@ class ClientChat(metaclass=ClientVerifier):
         await self.main_loop()
 
     async def main_loop(self):
-        self.connect_to_server_loop()
+        await self.connect_to_server_loop()
         async with trio.open_nursery() as nursery:
             ui = self.client_ui_talk.get_ui()
             nursery.start_soon(ui.command_handler)
@@ -193,7 +201,7 @@ class ClientChat(metaclass=ClientVerifier):
                         return
 
                 # logger.debug('incomming_messages_loop: тик-так')
-                incomming_message = self.get_incomming_message()
+                incomming_message = await self.get_incomming_message()
                 if incomming_message:
                     incomming_data = self.parse_incomming_message(
                         incomming_message
@@ -205,11 +213,11 @@ class ClientChat(metaclass=ClientVerifier):
         request_model = await self.response_handler.processing_command(command)
 
         if request_model:
-            self.processing_outgoing_model(request_model)
+            await self.processing_outgoing_model(request_model)
 
-    def processing_outgoing_model(self, message_model: BaseModel):
+    async def processing_outgoing_model(self, message_model: BaseModel):
         outgoing_message = str(message_model.json())
-        self.send_outgoing_message(outgoing_message=outgoing_message)
+        await self.send_outgoing_message(outgoing_message=outgoing_message)
         self.client_ui_talk.put_outgoing_message(
             message_model
         )

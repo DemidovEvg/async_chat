@@ -5,6 +5,7 @@ from pydantic import Field
 
 class ServerActions(str, Enum):
     probe = 'probe'
+    token = 'Bearer'
 
 
 class ServerMessageType(str, Enum):
@@ -44,3 +45,8 @@ class MessageProbe(ActionTimeBase):
 
 class MessageContacts(MessageAlert):
     alert: list[UserBase]
+
+
+class MessageToken(RequestResponseBase):
+    token: str
+    token_type: str = Field(ServerActions.token.value, const=True)

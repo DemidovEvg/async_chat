@@ -13,7 +13,7 @@ from sqlalchemy.orm import (
     relationship
 )
 from async_chat import settings
-
+from async_chat.server.auth import AuthMixin
 
 engine = create_engine(settings.database_path)
 
@@ -25,7 +25,7 @@ class Base(DeclarativeBase):
     pass
 
 
-class User(Base):
+class User(Base, AuthMixin):
     __tablename__ = 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
     account_name: Mapped[str]

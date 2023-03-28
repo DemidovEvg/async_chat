@@ -10,6 +10,8 @@ class User:
     is_entered: bool = False
     room: str = DEFAULT_ROOM
     contacts: list[str] = field(default_factory=list)
+    try_login: bool = False
+    token: str = ''
 
 
 current_user = User()
