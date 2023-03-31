@@ -1,3 +1,4 @@
+"""Класс-прослойка между сервером и визуальным интерфейсом"""
 import typing
 if typing.TYPE_CHECKING:
     from async_chat.server.admin_ui.main import MainWindowContol, ServerConfig

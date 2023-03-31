@@ -1,3 +1,6 @@
+"""Интерфейс для создания хендлеров ответов
+
+Позволяет реализовать класс отвечающий за формирование запросов и ответов клиента"""
 from typing import Any
 import logging
 from abc import ABC, abstractmethod

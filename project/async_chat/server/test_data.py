@@ -1,3 +1,6 @@
+"""Модуль тестовых данных
+
+Позволяет заполнить базу данных тестовыми пользователия и их историей"""
 import random
 import datetime as dt
 from sqlalchemy.orm import Session

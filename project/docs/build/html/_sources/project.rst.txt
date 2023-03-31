@@ -1,0 +1,54 @@
+project package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   project.async_chat
+   project.log_config
+
+Submodules
+----------
+
+project.client\_main module
+---------------------------
+
+.. automodule:: project.client_main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project.client\_main\_ui module
+-------------------------------
+
+.. automodule:: project.client_main_ui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project.server\_main module
+---------------------------
+
+.. automodule:: project.server_main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project.server\_main\_ui module
+-------------------------------
+
+.. automodule:: project.server_main_ui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: project
+   :members:
+   :undoc-members:
+   :show-inheritance:

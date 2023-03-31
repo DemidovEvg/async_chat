@@ -1,3 +1,4 @@
+"""Класс обработки запросов-ответов для интерфейска"""
 from async_chat.client.base_response_handler import BaseResponseHandler
 import logging
 import typing

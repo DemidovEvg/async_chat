@@ -1,3 +1,4 @@
+"""Декораторы и фукнции аутентификации"""
 from typing import Any
 import logging
 import datetime as dt

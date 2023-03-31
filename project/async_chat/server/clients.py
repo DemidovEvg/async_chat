@@ -1,3 +1,4 @@
+"""Модуль структуры хранящей текущих клиентов и их очередей сообщений"""
 import socket
 from dataclasses import dataclass, field
 from collections import defaultdict, deque

@@ -1,3 +1,4 @@
+"""Базовый класс окна QT с таблицей элементов"""
 import sys
 from pathlib import Path
 from PySide6 import QtWidgets, QtCore, QtUiTools

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import datetime as dt
-from async_chat.server.db import UserService
+from async_chat.server.user_service import UserService
 from async_chat.server import ServerChat
 from async_chat.server import db as test_db  # Noqa
 from async_chat import jim

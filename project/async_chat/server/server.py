@@ -1,3 +1,4 @@
+"""Основной код класса сервера"""
 import socket
 import signal
 import sys
@@ -71,6 +72,7 @@ class ServerSocket(socket.socket):
 
 
 class ServerChat(metaclass=ServerVerifier):
+    """Класс сервера чата"""
 
     def __init__(
         self, port: int,

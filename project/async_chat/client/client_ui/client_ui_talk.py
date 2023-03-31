@@ -1,3 +1,4 @@
+"""Прослойка между клиентом и пользовательским интерфейсом"""
 import typing
 from typing import TypeVar, Generic
 from queue import Queue

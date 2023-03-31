@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>async_chat package &mdash; документация Nano Chat 0.9</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="async_chat.client package" href="async_chat.client.html" />
+    <link rel="prev" title="async_chat" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Nano Chat
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">async_chat</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">async_chat package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html">async_chat.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html">async_chat.jim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html">async_chat.server package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html">async_chat.tests package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-async_chat.settings">async_chat.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-async_chat.utils">async_chat.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.MessageDto"><code class="docutils literal notranslate"><span class="pre">MessageDto</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.WrongCommand"><code class="docutils literal notranslate"><span class="pre">WrongCommand</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.decrypt"><code class="docutils literal notranslate"><span class="pre">decrypt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.encrypt"><code class="docutils literal notranslate"><span class="pre">encrypt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.generate_keys"><code class="docutils literal notranslate"><span class="pre">generate_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.get_message_dto_"><code class="docutils literal notranslate"><span class="pre">get_message_dto_()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#async_chat.utils.load_keys"><code class="docutils literal notranslate"><span class="pre">load_keys()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-async_chat">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Nano Chat</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">async_chat</a></li>
+      <li class="breadcrumb-item active">async_chat package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/async_chat.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="async-chat-package">
+<h1>async_chat package<a class="headerlink" href="#async-chat-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="async_chat.client.html">async_chat.client package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.base_response_handler">async_chat.client.base_response_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.dispatch_incomming_data"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.dispatch_incomming_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.dispatch_incomming_model"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.dispatch_incomming_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.dispatch_outgoing_model"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.dispatch_outgoing_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.dispatch_result_dict"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.dispatch_result_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.is_success"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.is_success()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.processing_incomming_alert_or_error"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.processing_incomming_alert_or_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.processing_outgoing_message"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.processing_outgoing_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_add_contact"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_add_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_delete_contact"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_delete_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_get_contacts"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_join_room"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_join_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_leave_room"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_leave_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_login"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_logout"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_message"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_out_message"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_out_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.result_probe"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.result_probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_response_handler.BaseResponseHandler.strange_result"><code class="docutils literal notranslate"><span class="pre">BaseResponseHandler.strange_result()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.base_ui">async_chat.client.base_ui module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_ui.BaseUI"><code class="docutils literal notranslate"><span class="pre">BaseUI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.base_ui.BaseUI.command_handler"><code class="docutils literal notranslate"><span class="pre">BaseUI.command_handler()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.client">async_chat.client.client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat"><code class="docutils literal notranslate"><span class="pre">ClientChat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.close_client"><code class="docutils literal notranslate"><span class="pre">ClientChat.close_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.close_socket"><code class="docutils literal notranslate"><span class="pre">ClientChat.close_socket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.connect_to_server"><code class="docutils literal notranslate"><span class="pre">ClientChat.connect_to_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.connect_to_server_loop"><code class="docutils literal notranslate"><span class="pre">ClientChat.connect_to_server_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.dispatch_incomming_data"><code class="docutils literal notranslate"><span class="pre">ClientChat.dispatch_incomming_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.form_data"><code class="docutils literal notranslate"><span class="pre">ClientChat.form_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.get_incomming_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.get_incomming_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.get_message_size"><code class="docutils literal notranslate"><span class="pre">ClientChat.get_message_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.main_loop"><code class="docutils literal notranslate"><span class="pre">ClientChat.main_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.parse_incomming_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.parse_incomming_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.print_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.print_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.processing_command"><code class="docutils literal notranslate"><span class="pre">ClientChat.processing_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.processing_outgoing_model"><code class="docutils literal notranslate"><span class="pre">ClientChat.processing_outgoing_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.put_message_to_ui"><code class="docutils literal notranslate"><span class="pre">ClientChat.put_message_to_ui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.run"><code class="docutils literal notranslate"><span class="pre">ClientChat.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.ClientChat.send_outgoing_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.send_outgoing_message()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.Timer"><code class="docutils literal notranslate"><span class="pre">Timer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.Timer.restart"><code class="docutils literal notranslate"><span class="pre">Timer.restart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client.Timer.time_is_over"><code class="docutils literal notranslate"><span class="pre">Timer.time_is_over()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.client_response_handler">async_chat.client.client_response_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_add_contact"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_add_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_del_contact"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_del_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_get_contacts"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_join"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_join()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_leave"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_leave()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_login"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_logout"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.action_send_message"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.action_send_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.processing_command"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.processing_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.processing_outgoing_message"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.processing_outgoing_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_add_contact"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_add_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_delete_contact"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_delete_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_get_contacts"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_join_room"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_join_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_leave_room"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_leave_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_login"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_logout"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_message"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_out_message"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_out_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.result_probe"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.result_probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.strange_result"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.strange_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_response_handler.ClientResponseHandler.sync_account_name_and_password_from_command"><code class="docutils literal notranslate"><span class="pre">ClientResponseHandler.sync_account_name_and_password_from_command()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.client_ui_response_handler">async_chat.client.client_ui_response_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.processing_outgoing_message"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.processing_outgoing_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_add_contact"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_add_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_delete_contact"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_delete_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_get_contacts"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_join_room"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_join_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_leave_room"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_leave_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_login"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_logout"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_message"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_out_message"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_out_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.result_probe"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.result_probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_ui_response_handler.ClientUIResponseHandler.strange_result"><code class="docutils literal notranslate"><span class="pre">ClientUIResponseHandler.strange_result()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.client_verifier">async_chat.client.client_verifier module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.client_verifier.ClientVerifier"><code class="docutils literal notranslate"><span class="pre">ClientVerifier</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.console">async_chat.client.console module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer"><code class="docutils literal notranslate"><span class="pre">ConsoleServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.ainput"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.ainput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.command_handler"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.command_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.command_processing"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.command_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.get_message"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.get_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.print_help"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.print_help()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.console.ConsoleServer.set_is_entered"><code class="docutils literal notranslate"><span class="pre">ConsoleServer.set_is_entered()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.current_user">async_chat.client.current_user module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.account_name"><code class="docutils literal notranslate"><span class="pre">User.account_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.contacts"><code class="docutils literal notranslate"><span class="pre">User.contacts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.is_entered"><code class="docutils literal notranslate"><span class="pre">User.is_entered</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.password"><code class="docutils literal notranslate"><span class="pre">User.password</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.room"><code class="docutils literal notranslate"><span class="pre">User.room</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.token"><code class="docutils literal notranslate"><span class="pre">User.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.current_user.User.try_login"><code class="docutils literal notranslate"><span class="pre">User.try_login</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client.message_chain">async_chat.client.message_chain module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict.clean_key"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict.clean_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict.clean_keys"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict.clean_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict.get_data"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict.get_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict.is_key_expired"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict.is_key_expired()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.message_chain.AutoCleaningDict.keys"><code class="docutils literal notranslate"><span class="pre">AutoCleaningDict.keys()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.client.html#module-async_chat.client">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat"><code class="docutils literal notranslate"><span class="pre">ClientChat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.close_client"><code class="docutils literal notranslate"><span class="pre">ClientChat.close_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.close_socket"><code class="docutils literal notranslate"><span class="pre">ClientChat.close_socket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.connect_to_server"><code class="docutils literal notranslate"><span class="pre">ClientChat.connect_to_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.connect_to_server_loop"><code class="docutils literal notranslate"><span class="pre">ClientChat.connect_to_server_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.dispatch_incomming_data"><code class="docutils literal notranslate"><span class="pre">ClientChat.dispatch_incomming_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.form_data"><code class="docutils literal notranslate"><span class="pre">ClientChat.form_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.get_incomming_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.get_incomming_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.get_message_size"><code class="docutils literal notranslate"><span class="pre">ClientChat.get_message_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.main_loop"><code class="docutils literal notranslate"><span class="pre">ClientChat.main_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.parse_incomming_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.parse_incomming_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.print_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.print_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.processing_command"><code class="docutils literal notranslate"><span class="pre">ClientChat.processing_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.processing_outgoing_model"><code class="docutils literal notranslate"><span class="pre">ClientChat.processing_outgoing_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.put_message_to_ui"><code class="docutils literal notranslate"><span class="pre">ClientChat.put_message_to_ui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.run"><code class="docutils literal notranslate"><span class="pre">ClientChat.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.client.html#async_chat.client.ClientChat.send_outgoing_message"><code class="docutils literal notranslate"><span class="pre">ClientChat.send_outgoing_message()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="async_chat.jim.html">async_chat.jim package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#module-async_chat.jim.client_schemas">async_chat.jim.client_schemas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions"><code class="docutils literal notranslate"><span class="pre">ClientActions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.add_contact"><code class="docutils literal notranslate"><span class="pre">ClientActions.add_contact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.authenticate"><code class="docutils literal notranslate"><span class="pre">ClientActions.authenticate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.del_contact"><code class="docutils literal notranslate"><span class="pre">ClientActions.del_contact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.get_contacts"><code class="docutils literal notranslate"><span class="pre">ClientActions.get_contacts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.join_"><code class="docutils literal notranslate"><span class="pre">ClientActions.join_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.leave"><code class="docutils literal notranslate"><span class="pre">ClientActions.leave</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.msg"><code class="docutils literal notranslate"><span class="pre">ClientActions.msg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.presence"><code class="docutils literal notranslate"><span class="pre">ClientActions.presence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.ClientActions.quit"><code class="docutils literal notranslate"><span class="pre">ClientActions.quit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageAddContact"><code class="docutils literal notranslate"><span class="pre">MessageAddContact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageAddContact.action"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageAddContact.target_user"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.target_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageAddContact.token"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageAddContact.user"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend.action"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend.encoding"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.encoding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend.from_"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.from_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend.message"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageBaseActionSend.token"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.token</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageDeleteContact"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageDeleteContact.action"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageDeleteContact.target_user"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.target_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageDeleteContact.token"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageDeleteContact.user"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageGetContacts"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageGetContacts.action"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageGetContacts.token"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageGetContacts.user"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageSendMessage"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageSendMessage.to_"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.to_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageSendMessage.token"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageSendMessage.user"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserAuth"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserAuth.action"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserAuth.user"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserJoinRoom"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserJoinRoom.action"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserJoinRoom.room"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.room</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserJoinRoom.token"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserJoinRoom.user"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserLeaveRoom"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserLeaveRoom.action"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserLeaveRoom.token"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserLeaveRoom.user"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserPresence"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserPresence.action"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserPresence.token"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserPresence.user"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserQuit"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserQuit.action"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserQuit.token"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.MessageUserQuit.user"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.Statuses"><code class="docutils literal notranslate"><span class="pre">Statuses</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.Statuses.i_am_here"><code class="docutils literal notranslate"><span class="pre">Statuses.i_am_here</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.UserForAuth"><code class="docutils literal notranslate"><span class="pre">UserForAuth</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.UserForAuth.password"><code class="docutils literal notranslate"><span class="pre">UserForAuth.password</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.UserForPresence"><code class="docutils literal notranslate"><span class="pre">UserForPresence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.client_schemas.UserForPresence.status"><code class="docutils literal notranslate"><span class="pre">UserForPresence.status</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#module-async_chat.jim.common_schemas">async_chat.jim.common_schemas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.ActionTimeBase"><code class="docutils literal notranslate"><span class="pre">ActionTimeBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.ActionTimeBase.action"><code class="docutils literal notranslate"><span class="pre">ActionTimeBase.action</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase"><code class="docutils literal notranslate"><span class="pre">TimeBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase.Config"><code class="docutils literal notranslate"><span class="pre">TimeBase.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase.chain_id"><code class="docutils literal notranslate"><span class="pre">TimeBase.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase.id"><code class="docutils literal notranslate"><span class="pre">TimeBase.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase.schema_class"><code class="docutils literal notranslate"><span class="pre">TimeBase.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.TimeBase.time"><code class="docutils literal notranslate"><span class="pre">TimeBase.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.UserBase"><code class="docutils literal notranslate"><span class="pre">UserBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.common_schemas.UserBase.account_name"><code class="docutils literal notranslate"><span class="pre">UserBase.account_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#module-async_chat.jim.data_validator">async_chat.jim.data_validator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.data_validator.DataValidator"><code class="docutils literal notranslate"><span class="pre">DataValidator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.data_validator.DataValidator.get_error"><code class="docutils literal notranslate"><span class="pre">DataValidator.get_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.data_validator.DataValidator.get_model"><code class="docutils literal notranslate"><span class="pre">DataValidator.get_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.data_validator.DataValidator.is_valid"><code class="docutils literal notranslate"><span class="pre">DataValidator.is_valid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#module-async_chat.jim.server_schemas">async_chat.jim.server_schemas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageAlert"><code class="docutils literal notranslate"><span class="pre">MessageAlert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageAlert.alert"><code class="docutils literal notranslate"><span class="pre">MessageAlert.alert</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageContacts"><code class="docutils literal notranslate"><span class="pre">MessageContacts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageContacts.alert"><code class="docutils literal notranslate"><span class="pre">MessageContacts.alert</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageError"><code class="docutils literal notranslate"><span class="pre">MessageError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageError.error"><code class="docutils literal notranslate"><span class="pre">MessageError.error</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageProbe"><code class="docutils literal notranslate"><span class="pre">MessageProbe</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageProbe.action"><code class="docutils literal notranslate"><span class="pre">MessageProbe.action</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageToken"><code class="docutils literal notranslate"><span class="pre">MessageToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageToken.token"><code class="docutils literal notranslate"><span class="pre">MessageToken.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.MessageToken.token_type"><code class="docutils literal notranslate"><span class="pre">MessageToken.token_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.RequestResponseBase"><code class="docutils literal notranslate"><span class="pre">RequestResponseBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.RequestResponseBase.response"><code class="docutils literal notranslate"><span class="pre">RequestResponseBase.response</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.ServerActions"><code class="docutils literal notranslate"><span class="pre">ServerActions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.ServerActions.probe"><code class="docutils literal notranslate"><span class="pre">ServerActions.probe</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.ServerActions.token"><code class="docutils literal notranslate"><span class="pre">ServerActions.token</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.ServerMessageType"><code class="docutils literal notranslate"><span class="pre">ServerMessageType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.ServerMessageType.contact"><code class="docutils literal notranslate"><span class="pre">ServerMessageType.contact</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes"><code class="docutils literal notranslate"><span class="pre">StatusCodes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_100_INFO"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_100_INFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_101_IMPORTANT_INFO"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_101_IMPORTANT_INFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_200_OK"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_200_OK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_201_CREATED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_201_CREATED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_202_ACCEPTED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_202_ACCEPTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_400_BAD_REQUEST"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_400_BAD_REQUEST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_401_UNAUTHORIZED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_401_UNAUTHORIZED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_403_FORBIDDEN"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_403_FORBIDDEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_404_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_404_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_409_CONFLICT"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_409_CONFLICT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.server_schemas.StatusCodes.HTTP_410_GONE"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_410_GONE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.jim.html#module-async_chat.jim">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions"><code class="docutils literal notranslate"><span class="pre">ClientActions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.add_contact"><code class="docutils literal notranslate"><span class="pre">ClientActions.add_contact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.authenticate"><code class="docutils literal notranslate"><span class="pre">ClientActions.authenticate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.del_contact"><code class="docutils literal notranslate"><span class="pre">ClientActions.del_contact</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.get_contacts"><code class="docutils literal notranslate"><span class="pre">ClientActions.get_contacts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.join_"><code class="docutils literal notranslate"><span class="pre">ClientActions.join_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.leave"><code class="docutils literal notranslate"><span class="pre">ClientActions.leave</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.msg"><code class="docutils literal notranslate"><span class="pre">ClientActions.msg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.presence"><code class="docutils literal notranslate"><span class="pre">ClientActions.presence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ClientActions.quit"><code class="docutils literal notranslate"><span class="pre">ClientActions.quit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.DataValidator"><code class="docutils literal notranslate"><span class="pre">DataValidator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.DataValidator.get_error"><code class="docutils literal notranslate"><span class="pre">DataValidator.get_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.DataValidator.get_model"><code class="docutils literal notranslate"><span class="pre">DataValidator.get_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.DataValidator.is_valid"><code class="docutils literal notranslate"><span class="pre">DataValidator.is_valid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact"><code class="docutils literal notranslate"><span class="pre">MessageAddContact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.action"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.id"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.target_user"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.target_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.time"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.token"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAddContact.user"><code class="docutils literal notranslate"><span class="pre">MessageAddContact.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert"><code class="docutils literal notranslate"><span class="pre">MessageAlert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.alert"><code class="docutils literal notranslate"><span class="pre">MessageAlert.alert</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageAlert.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.id"><code class="docutils literal notranslate"><span class="pre">MessageAlert.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.response"><code class="docutils literal notranslate"><span class="pre">MessageAlert.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageAlert.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageAlert.time"><code class="docutils literal notranslate"><span class="pre">MessageAlert.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.action"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.encoding"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.encoding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.from_"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.from_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.id"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.message"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.time"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageBaseActionSend.token"><code class="docutils literal notranslate"><span class="pre">MessageBaseActionSend.token</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts"><code class="docutils literal notranslate"><span class="pre">MessageContacts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.alert"><code class="docutils literal notranslate"><span class="pre">MessageContacts.alert</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageContacts.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.id"><code class="docutils literal notranslate"><span class="pre">MessageContacts.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.response"><code class="docutils literal notranslate"><span class="pre">MessageContacts.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageContacts.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageContacts.time"><code class="docutils literal notranslate"><span class="pre">MessageContacts.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.action"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.id"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.target_user"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.target_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.time"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.token"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageDeleteContact.user"><code class="docutils literal notranslate"><span class="pre">MessageDeleteContact.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError"><code class="docutils literal notranslate"><span class="pre">MessageError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageError.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.error"><code class="docutils literal notranslate"><span class="pre">MessageError.error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.id"><code class="docutils literal notranslate"><span class="pre">MessageError.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.response"><code class="docutils literal notranslate"><span class="pre">MessageError.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageError.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageError.time"><code class="docutils literal notranslate"><span class="pre">MessageError.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.action"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.id"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.time"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.token"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageGetContacts.user"><code class="docutils literal notranslate"><span class="pre">MessageGetContacts.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe"><code class="docutils literal notranslate"><span class="pre">MessageProbe</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe.action"><code class="docutils literal notranslate"><span class="pre">MessageProbe.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageProbe.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe.id"><code class="docutils literal notranslate"><span class="pre">MessageProbe.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageProbe.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageProbe.time"><code class="docutils literal notranslate"><span class="pre">MessageProbe.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.action"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.encoding"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.encoding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.from_"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.from_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.id"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.message"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.time"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.to_"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.to_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.token"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageSendMessage.user"><code class="docutils literal notranslate"><span class="pre">MessageSendMessage.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken"><code class="docutils literal notranslate"><span class="pre">MessageToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageToken.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.id"><code class="docutils literal notranslate"><span class="pre">MessageToken.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.response"><code class="docutils literal notranslate"><span class="pre">MessageToken.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageToken.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.time"><code class="docutils literal notranslate"><span class="pre">MessageToken.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.token"><code class="docutils literal notranslate"><span class="pre">MessageToken.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageToken.token_type"><code class="docutils literal notranslate"><span class="pre">MessageToken.token_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.action"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.id"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.time"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserAuth.user"><code class="docutils literal notranslate"><span class="pre">MessageUserAuth.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.action"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.id"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.room"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.room</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.time"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.token"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserJoinRoom.user"><code class="docutils literal notranslate"><span class="pre">MessageUserJoinRoom.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.action"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.id"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.time"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.token"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserLeaveRoom.user"><code class="docutils literal notranslate"><span class="pre">MessageUserLeaveRoom.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.action"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.id"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.time"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.token"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserPresence.user"><code class="docutils literal notranslate"><span class="pre">MessageUserPresence.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.action"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.chain_id"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.id"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.schema_class"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.time"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.token"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.MessageUserQuit.user"><code class="docutils literal notranslate"><span class="pre">MessageUserQuit.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ServerActions"><code class="docutils literal notranslate"><span class="pre">ServerActions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ServerActions.probe"><code class="docutils literal notranslate"><span class="pre">ServerActions.probe</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ServerActions.token"><code class="docutils literal notranslate"><span class="pre">ServerActions.token</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ServerMessageType"><code class="docutils literal notranslate"><span class="pre">ServerMessageType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.ServerMessageType.contact"><code class="docutils literal notranslate"><span class="pre">ServerMessageType.contact</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes"><code class="docutils literal notranslate"><span class="pre">StatusCodes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_100_INFO"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_100_INFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_101_IMPORTANT_INFO"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_101_IMPORTANT_INFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_200_OK"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_200_OK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_201_CREATED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_201_CREATED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_202_ACCEPTED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_202_ACCEPTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_400_BAD_REQUEST"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_400_BAD_REQUEST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_401_UNAUTHORIZED"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_401_UNAUTHORIZED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_402_BAD_PASSWORD_OR_LOGIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_403_FORBIDDEN"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_403_FORBIDDEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_404_NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_404_NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_409_CONFLICT"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_409_CONFLICT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.StatusCodes.HTTP_410_GONE"><code class="docutils literal notranslate"><span class="pre">StatusCodes.HTTP_410_GONE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.Statuses"><code class="docutils literal notranslate"><span class="pre">Statuses</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.Statuses.i_am_here"><code class="docutils literal notranslate"><span class="pre">Statuses.i_am_here</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase"><code class="docutils literal notranslate"><span class="pre">TimeBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase.Config"><code class="docutils literal notranslate"><span class="pre">TimeBase.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase.chain_id"><code class="docutils literal notranslate"><span class="pre">TimeBase.chain_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase.id"><code class="docutils literal notranslate"><span class="pre">TimeBase.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase.schema_class"><code class="docutils literal notranslate"><span class="pre">TimeBase.schema_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.TimeBase.time"><code class="docutils literal notranslate"><span class="pre">TimeBase.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.UserBase"><code class="docutils literal notranslate"><span class="pre">UserBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.jim.html#async_chat.jim.UserBase.account_name"><code class="docutils literal notranslate"><span class="pre">UserBase.account_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="async_chat.server.html">async_chat.server package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.admin_ui.html">async_chat.server.admin_ui package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.item_list">async_chat.server.admin_ui.item_list module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.main">async_chat.server.admin_ui.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.paginator">async_chat.server.admin_ui.paginator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.server_ui_talk">async_chat.server.admin_ui.server_ui_talk module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.user_list">async_chat.server.admin_ui.user_list module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui.user_list_stat">async_chat.server.admin_ui.user_list_stat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.admin_ui.html#module-async_chat.server.admin_ui">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.auth">async_chat.server.auth module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.auth.AuthMixin"><code class="docutils literal notranslate"><span class="pre">AuthMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.auth.AuthMixin.get_password_hash"><code class="docutils literal notranslate"><span class="pre">AuthMixin.get_password_hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.auth.AuthMixin.pwd_context"><code class="docutils literal notranslate"><span class="pre">AuthMixin.pwd_context</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.auth.AuthMixin.verify_password"><code class="docutils literal notranslate"><span class="pre">AuthMixin.verify_password()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.clients">async_chat.server.clients module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Client.socket"><code class="docutils literal notranslate"><span class="pre">Client.socket</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Client.time"><code class="docutils literal notranslate"><span class="pre">Client.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Client.user_id"><code class="docutils literal notranslate"><span class="pre">Client.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients"><code class="docutils literal notranslate"><span class="pre">Clients</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.append"><code class="docutils literal notranslate"><span class="pre">Clients.append()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.get_client_by_socket"><code class="docutils literal notranslate"><span class="pre">Clients.get_client_by_socket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.get_room_name"><code class="docutils literal notranslate"><span class="pre">Clients.get_room_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.get_users_ids_in_room"><code class="docutils literal notranslate"><span class="pre">Clients.get_users_ids_in_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.join_to_room"><code class="docutils literal notranslate"><span class="pre">Clients.join_to_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.logout_client"><code class="docutils literal notranslate"><span class="pre">Clients.logout_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.remove"><code class="docutils literal notranslate"><span class="pre">Clients.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.Clients.remove_another_client_with_user"><code class="docutils literal notranslate"><span class="pre">Clients.remove_another_client_with_user()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages"><code class="docutils literal notranslate"><span class="pre">UsersMessages</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages.get_all_messages_from_queue"><code class="docutils literal notranslate"><span class="pre">UsersMessages.get_all_messages_from_queue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages.get_message_from_queue"><code class="docutils literal notranslate"><span class="pre">UsersMessages.get_message_from_queue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages.get_queue_for_target"><code class="docutils literal notranslate"><span class="pre">UsersMessages.get_queue_for_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages.put_back_message_to_queue"><code class="docutils literal notranslate"><span class="pre">UsersMessages.put_back_message_to_queue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.clients.UsersMessages.put_message_to_queue"><code class="docutils literal notranslate"><span class="pre">UsersMessages.put_message_to_queue()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.db">async_chat.server.db module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact"><code class="docutils literal notranslate"><span class="pre">Contact</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact.friend"><code class="docutils literal notranslate"><span class="pre">Contact.friend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact.friend_id"><code class="docutils literal notranslate"><span class="pre">Contact.friend_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact.id"><code class="docutils literal notranslate"><span class="pre">Contact.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact.user"><code class="docutils literal notranslate"><span class="pre">Contact.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.Contact.user_id"><code class="docutils literal notranslate"><span class="pre">Contact.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History"><code class="docutils literal notranslate"><span class="pre">History</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.Event"><code class="docutils literal notranslate"><span class="pre">History.Event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.adress"><code class="docutils literal notranslate"><span class="pre">History.adress</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.event"><code class="docutils literal notranslate"><span class="pre">History.event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.id"><code class="docutils literal notranslate"><span class="pre">History.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.time"><code class="docutils literal notranslate"><span class="pre">History.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.user"><code class="docutils literal notranslate"><span class="pre">History.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.History.user_id"><code class="docutils literal notranslate"><span class="pre">History.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.account_name"><code class="docutils literal notranslate"><span class="pre">User.account_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.check_password"><code class="docutils literal notranslate"><span class="pre">User.check_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.contacts"><code class="docutils literal notranslate"><span class="pre">User.contacts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.friends"><code class="docutils literal notranslate"><span class="pre">User.friends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.friends_with_us"><code class="docutils literal notranslate"><span class="pre">User.friends_with_us</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.has_entered"><code class="docutils literal notranslate"><span class="pre">User.has_entered</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.histories"><code class="docutils literal notranslate"><span class="pre">User.histories</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.id"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.is_online"><code class="docutils literal notranslate"><span class="pre">User.is_online()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.last_get_message"><code class="docutils literal notranslate"><span class="pre">User.last_get_message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.last_login"><code class="docutils literal notranslate"><span class="pre">User.last_login</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.last_logout"><code class="docutils literal notranslate"><span class="pre">User.last_logout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.last_send_message"><code class="docutils literal notranslate"><span class="pre">User.last_send_message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.password"><code class="docutils literal notranslate"><span class="pre">User.password</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.User.user_service"><code class="docutils literal notranslate"><span class="pre">User.user_service</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.db.create_test_data"><code class="docutils literal notranslate"><span class="pre">create_test_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.response_handler">async_chat.server.response_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler"><code class="docutils literal notranslate"><span class="pre">ResponseHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.dispatch_request"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.dispatch_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.get_message_dto"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.get_message_dto()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.get_message_model"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.get_message_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_add_contact"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_add_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_delete_contact"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_delete_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_get_contacts"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_get_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_join_room"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_join_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_leave_room"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_leave_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_login_user"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_login_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_logout_user"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_logout_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_message"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_presence"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_presence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.processing_request"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.processing_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.put_message_for_all_users_exclude_current"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.put_message_for_all_users_exclude_current()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.put_message_for_current_client"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.put_message_for_current_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.put_message_for_user"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.put_message_for_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.response_handler.ResponseHandler.return_error"><code class="docutils literal notranslate"><span class="pre">ResponseHandler.return_error()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.server">async_chat.server.server module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.PortDescriptor"><code class="docutils literal notranslate"><span class="pre">PortDescriptor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat"><code class="docutils literal notranslate"><span class="pre">ServerChat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.close_server"><code class="docutils literal notranslate"><span class="pre">ServerChat.close_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.database_connected"><code class="docutils literal notranslate"><span class="pre">ServerChat.database_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.dispatch_requests"><code class="docutils literal notranslate"><span class="pre">ServerChat.dispatch_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.form_data"><code class="docutils literal notranslate"><span class="pre">ServerChat.form_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.get_message_size"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_message_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.get_request"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.get_requests"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.get_sockets"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_sockets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.init_socket"><code class="docutils literal notranslate"><span class="pre">ServerChat.init_socket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.processing_queues_messages"><code class="docutils literal notranslate"><span class="pre">ServerChat.processing_queues_messages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.run"><code class="docutils literal notranslate"><span class="pre">ServerChat.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.send_message"><code class="docutils literal notranslate"><span class="pre">ServerChat.send_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerChat.send_response"><code class="docutils literal notranslate"><span class="pre">ServerChat.send_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerSocket"><code class="docutils literal notranslate"><span class="pre">ServerSocket</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerSocket.bind"><code class="docutils literal notranslate"><span class="pre">ServerSocket.bind()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.ServerSocket.port"><code class="docutils literal notranslate"><span class="pre">ServerSocket.port</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.Sokets"><code class="docutils literal notranslate"><span class="pre">Sokets</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.Sokets.for_error"><code class="docutils literal notranslate"><span class="pre">Sokets.for_error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.Sokets.for_reading"><code class="docutils literal notranslate"><span class="pre">Sokets.for_reading</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.server.Sokets.for_writing"><code class="docutils literal notranslate"><span class="pre">Sokets.for_writing</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.server_verifier">async_chat.server.server_verifier module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.server_verifier.ServerVerifier"><code class="docutils literal notranslate"><span class="pre">ServerVerifier</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.test_data">async_chat.server.test_data module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.test_data.TestData"><code class="docutils literal notranslate"><span class="pre">TestData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.test_data.TestData.create_contacts"><code class="docutils literal notranslate"><span class="pre">TestData.create_contacts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.test_data.TestData.create_data_if_not_exist"><code class="docutils literal notranslate"><span class="pre">TestData.create_data_if_not_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.test_data.TestData.create_history"><code class="docutils literal notranslate"><span class="pre">TestData.create_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.test_data.TestData.create_users"><code class="docutils literal notranslate"><span class="pre">TestData.create_users()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.user_service">async_chat.server.user_service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService"><code class="docutils literal notranslate"><span class="pre">UserService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.add_contact_for_user"><code class="docutils literal notranslate"><span class="pre">UserService.add_contact_for_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.delete_contact_for_user"><code class="docutils literal notranslate"><span class="pre">UserService.delete_contact_for_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_all_users_ids"><code class="docutils literal notranslate"><span class="pre">UserService.get_all_users_ids()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_online_users"><code class="docutils literal notranslate"><span class="pre">UserService.get_online_users()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_user_by_account_name"><code class="docutils literal notranslate"><span class="pre">UserService.get_user_by_account_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_user_by_id"><code class="docutils literal notranslate"><span class="pre">UserService.get_user_by_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_user_send_messages_count"><code class="docutils literal notranslate"><span class="pre">UserService.get_user_send_messages_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_users"><code class="docutils literal notranslate"><span class="pre">UserService.get_users()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.get_users_with_no_friends"><code class="docutils literal notranslate"><span class="pre">UserService.get_users_with_no_friends()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.login"><code class="docutils literal notranslate"><span class="pre">UserService.login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.logout"><code class="docutils literal notranslate"><span class="pre">UserService.logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.presence"><code class="docutils literal notranslate"><span class="pre">UserService.presence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.user_get_message_from_server"><code class="docutils literal notranslate"><span class="pre">UserService.user_get_message_from_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.user_service.UserService.user_send_message_to_server"><code class="docutils literal notranslate"><span class="pre">UserService.user_send_message_to_server()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server.utils_auth">async_chat.server.utils_auth module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.utils_auth.append_current_user"><code class="docutils literal notranslate"><span class="pre">append_current_user()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.utils_auth.create_access_token"><code class="docutils literal notranslate"><span class="pre">create_access_token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.utils_auth.login_required"><code class="docutils literal notranslate"><span class="pre">login_required()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.server.html#module-async_chat.server">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat"><code class="docutils literal notranslate"><span class="pre">ServerChat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.close_server"><code class="docutils literal notranslate"><span class="pre">ServerChat.close_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.database_connected"><code class="docutils literal notranslate"><span class="pre">ServerChat.database_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.dispatch_requests"><code class="docutils literal notranslate"><span class="pre">ServerChat.dispatch_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.form_data"><code class="docutils literal notranslate"><span class="pre">ServerChat.form_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.get_message_size"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_message_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.get_request"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.get_requests"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.get_sockets"><code class="docutils literal notranslate"><span class="pre">ServerChat.get_sockets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.init_socket"><code class="docutils literal notranslate"><span class="pre">ServerChat.init_socket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.processing_queues_messages"><code class="docutils literal notranslate"><span class="pre">ServerChat.processing_queues_messages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.run"><code class="docutils literal notranslate"><span class="pre">ServerChat.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.send_message"><code class="docutils literal notranslate"><span class="pre">ServerChat.send_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.server.html#async_chat.server.ServerChat.send_response"><code class="docutils literal notranslate"><span class="pre">ServerChat.send_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="async_chat.tests.html">async_chat.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.tests.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.tests.test_client_chat.html">async_chat.tests.test_client_chat package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_client_chat.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_client_chat.html#module-async_chat.tests.test_client_chat.test_actions_client_chat">async_chat.tests.test_client_chat.test_actions_client_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_client_chat.html#module-async_chat.tests.test_client_chat.test_command_line_client_chat">async_chat.tests.test_client_chat.test_command_line_client_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_client_chat.html#module-async_chat.tests.test_client_chat.test_init_client_chat">async_chat.tests.test_client_chat.test_init_client_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_client_chat.html#module-async_chat.tests.test_client_chat">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.tests.test_server_chat.html">async_chat.tests.test_server_chat package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_server_chat.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_server_chat.html#module-async_chat.tests.test_server_chat.test_actions_server_chat">async_chat.tests.test_server_chat.test_actions_server_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_server_chat.html#module-async_chat.tests.test_server_chat.test_base_server_chat">async_chat.tests.test_server_chat.test_base_server_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_server_chat.html#module-async_chat.tests.test_server_chat.test_init_server_chat">async_chat.tests.test_server_chat.test_init_server_chat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.test_server_chat.html#module-async_chat.tests.test_server_chat">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.tests.html#module-async_chat.tests.test_client_schemas">async_chat.tests.test_client_schemas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.setUp"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_client_actions"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_client_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_client_statuses"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_client_statuses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_get_right_datetime"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_get_right_datetime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_message_user_auth"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_message_user_auth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_message_user_presence"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_message_user_presence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_client_schemas.TestClientSchemas.test_message_user_quit"><code class="docutils literal notranslate"><span class="pre">TestClientSchemas.test_message_user_quit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.tests.html#module-async_chat.tests.test_server_schemas">async_chat.tests.test_server_schemas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_server_schemas.TestServerSchemas"><code class="docutils literal notranslate"><span class="pre">TestServerSchemas</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_server_schemas.TestServerSchemas.setUp"><code class="docutils literal notranslate"><span class="pre">TestServerSchemas.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_server_schemas.TestServerSchemas.test_message_alert"><code class="docutils literal notranslate"><span class="pre">TestServerSchemas.test_message_alert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_server_schemas.TestServerSchemas.test_message_error"><code class="docutils literal notranslate"><span class="pre">TestServerSchemas.test_message_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="async_chat.tests.html#async_chat.tests.test_server_schemas.TestServerSchemas.test_required_status_codes"><code class="docutils literal notranslate"><span class="pre">TestServerSchemas.test_required_status_codes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async_chat.tests.html#module-async_chat.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-async_chat.settings">
+<span id="async-chat-settings-module"></span><h2>async_chat.settings module<a class="headerlink" href="#module-async_chat.settings" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-async_chat.utils">
+<span id="async-chat-utils-module"></span><h2>async_chat.utils module<a class="headerlink" href="#module-async_chat.utils" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="async_chat.utils.MessageDto">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">MessageDto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#async_chat.utils.MessageDto" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="async_chat.utils.MessageDto.error_message">
+<span class="sig-name descname"><span class="pre">error_message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#async_chat.utils.MessageDto.error_message" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="async_chat.utils.MessageDto.message_model">
+<span class="sig-name descname"><span class="pre">message_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">T</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#async_chat.utils.MessageDto.message_model" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="async_chat.utils.WrongCommand">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">WrongCommand</span></span><a class="headerlink" href="#async_chat.utils.WrongCommand" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="async_chat.utils.decrypt">
+<span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#async_chat.utils.decrypt" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="async_chat.utils.encrypt">
+<span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#async_chat.utils.encrypt" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="async_chat.utils.generate_keys">
+<span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">generate_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#async_chat.utils.generate_keys" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="async_chat.utils.get_message_dto_">
+<span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">get_message_dto_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#async_chat.utils.MessageDto" title="async_chat.utils.MessageDto"><span class="pre">MessageDto</span></a></span></span><a class="headerlink" href="#async_chat.utils.get_message_dto_" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="async_chat.utils.load_keys">
+<span class="sig-prename descclassname"><span class="pre">async_chat.utils.</span></span><span class="sig-name descname"><span class="pre">load_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#async_chat.utils.load_keys" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-async_chat">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-async_chat" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
+        <a href="modules.html" class="btn btn-neutral float-left" title="async_chat" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
+        <a href="async_chat.client.html" class="btn btn-neutral float-right" title="async_chat.client package" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Demidov.</p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

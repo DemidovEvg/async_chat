@@ -1,3 +1,5 @@
+"""Модуль миксина аутентификации пользователя"""
+
 from passlib.context import CryptContext
 
 
@@ -11,4 +13,3 @@ class AuthMixin:
     @classmethod
     def get_password_hash(cls, password: str) -> str:
         return cls.pwd_context.hash(password)
-

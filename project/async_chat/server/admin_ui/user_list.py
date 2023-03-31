@@ -1,3 +1,4 @@
+"""Класс окна со списком пользователей"""
 from async_chat.server.user_service import UserService
 from async_chat.server.db import SessionLocal, User
 from async_chat.server.admin_ui.item_list import ItemList

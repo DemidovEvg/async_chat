@@ -1,3 +1,6 @@
+"""Сервисный между orm и сервером
+
+Позволяет сгруппировать основные операциями над orm сущностями"""
 import datetime as dt
 from sqlalchemy import select, delete, func
 from sqlalchemy.orm import (

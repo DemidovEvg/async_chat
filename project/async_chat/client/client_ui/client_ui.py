@@ -1,3 +1,4 @@
+"""Десктопный интерфейс чата"""
 import signal
 import sys
 import traceback

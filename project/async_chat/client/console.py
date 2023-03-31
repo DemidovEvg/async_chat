@@ -1,3 +1,4 @@
+"""Консольное управление клиентом"""
 import logging
 import sys
 import trio

@@ -1,0 +1,37 @@
+project.log\_config package
+===========================
+
+Submodules
+----------
+
+project.log\_config.client\_log\_config module
+----------------------------------------------
+
+.. automodule:: project.log_config.client_log_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project.log\_config.server\_log\_config module
+----------------------------------------------
+
+.. automodule:: project.log_config.server_log_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project.log\_config.server\_rotating\_file\_handler module
+----------------------------------------------------------
+
+.. automodule:: project.log_config.server_rotating_file_handler
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: project.log_config
+   :members:
+   :undoc-members:
+   :show-inheritance:

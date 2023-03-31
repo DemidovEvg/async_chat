@@ -1,3 +1,8 @@
+"""Модуль реализующий класс обработки запросов пользователей
+
+На вход основного метода processing_request принимает запрос от пользователя, 
+ответ записывает в очередь сообщений пользователя
+"""
 import json
 import logging
 from typing import Any, Type
@@ -75,7 +80,7 @@ class ResponseHandler:
 
         return message_model
 
-    def processing_request(self, request: Request) -> None:
+    def processing_request(self, request: Request) -> str:
         try:
             data: dict[str, Any] = json.loads(request)
         except json.decoder.JSONDecodeError as exc:

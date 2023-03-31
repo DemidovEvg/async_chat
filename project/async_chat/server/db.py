@@ -1,3 +1,4 @@
+"""Модуль базы данных хранящей пользователей и их историю"""
 import datetime as dt
 from typing import Optional
 import enum

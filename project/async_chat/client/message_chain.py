@@ -1,3 +1,7 @@
+"""Хранилище цепочек сообщений
+
+Позволяет узнать к какому запросу клиента пришел ответ от сервера.
+Реализация основанна на самоотчищающемся словаре"""
 from collections import UserDict
 import datetime as dt
 from typing import Hashable

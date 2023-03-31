@@ -1,3 +1,4 @@
+"""Основной класс клиента ассинхронного чата"""
 import sys
 import socket
 import signal
