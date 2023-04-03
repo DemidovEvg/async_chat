@@ -1,0 +1,26 @@
+version: 1
+formatters:
+  slient-format:
+    format: '%(levelname)s - %(asctime)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: slient-format
+    stream: ext://sys.stdout
+  client-file:
+    class: nano_async_chat.log_config.server_rotating_file_handler.ServerRotatingFileHandler
+    level: DEBUG
+    formatter: slient-format
+    filename: I:/python/async_chat/src/nano_async_chat/log/client_log.log
+    backupCount: 3
+    maxBytes: 1000
+    encoding: utf-8
+loggers:
+  client-logger:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]

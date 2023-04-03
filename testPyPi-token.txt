@@ -1,0 +1,4 @@
+__token__
+pypi-AgENdGVzdC5weXBpLm9yZwIkODc5OWYyOWUtYzEzZC00OGVlLWI0ZjQtN2FkOWU4NzZmYjJhAAIqWzMsImJjNDZmYThkLTFjY2MtNGFjMi1hYjkwLWUzZDczZDZlMmQ3NiJdAAAGIOZOyoUryvmZ-MB4sfGvmTmdGpXyAnMkd2zIr68jltNe
+
+https://test.pypi.org/project/nano-async-chat/

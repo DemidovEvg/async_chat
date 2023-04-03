@@ -1,0 +1,28 @@
+version: 1
+formatters:
+  simple:
+    format: '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
+  server-format: 
+    format: '%(levelname)s - %(asctime)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: server-format
+    stream: ext://sys.stdout
+  server-file:
+    class: nano_async_chat.log_config.server_rotating_file_handler.ServerRotatingFileHandler
+    level: DEBUG
+    formatter: server-format
+    filename: I:/python/async_chat/src/nano_async_chat/log/server_log.log
+    backupCount: 3
+    maxBytes: 1000
+    encoding: utf-8
+loggers:
+  server-logger:
+    level: DEBUG
+    handlers: [console, server-file]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]

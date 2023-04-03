@@ -4,3 +4,9 @@ env
 **/*.log.*
 gitignore
 app.py
+
+**/docs/*
+
+**/*egg-info
+
+dist

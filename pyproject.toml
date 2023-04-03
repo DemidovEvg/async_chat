@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nano_async_chat"
+version = "0.0.2"
+authors = [
+  { name="Demidov Evgenii", email="Demidov.evg.v@gmail.com" },
+]
+description = "Good async chat with QT, SQLAlchemy and pydantic"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "SQLAlchemy>=2",
+    "trio>=0.22.0",
+    "PySide6>=6.4",
+    "click>=8.1",
+    "PyYaml>=6",
+    "python-dotenv>=1",
+    "passlib[bcrypt]>=1.7",
+    "rsa>=4.9",
+    "python-jose[cryptography]>=3.3"
+]
+[project.urls]
+"Homepage" = "https://github.com/DemidovEvg/async_chat"
